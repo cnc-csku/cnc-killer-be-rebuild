@@ -1,0 +1,11 @@
+services:
+  api:
+    build:
+      context: ./docker/
+      dockerfile: dev.Dockerfile
+    restart: on-failure
+    volumes:
+      - .:/app
+    working_dir: /app
+    ports:
+      - ${PORT}:${PORT}
