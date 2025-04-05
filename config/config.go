@@ -8,7 +8,14 @@ import (
 )
 
 type Config struct {
-	Port string `env:"PORT"`
+	Port uint16 `env:"PORT"`
+	// for postgres
+	DBHost     string `env:"DB_HOST"`
+	DBPort     uint16 `env:"DB_PORT"`
+	DBUsername string `env:"DB_USERNAME"`
+	DBPassword string `env:"DB_PASSWORD"`
+	DBDatabase string `env:"DB_DATABASE"`
+	SSLMode    string `env:"SSL_MODE"`
 }
 
 func NewConfig() Config {

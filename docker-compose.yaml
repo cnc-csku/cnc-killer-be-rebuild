@@ -9,3 +9,27 @@ services:
     working_dir: /app
     ports:
       - ${PORT}:${PORT}
+    networks:
+      - cnc-killer-network
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:16-alpine
+    restart : on-failure
+    volumes:
+      - cnc-killer-vol-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      TZ:  ${TIMEZONE}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    networks:
+      - cnc-killer-network
+networks:
+  cnc-killer-network:
+    driver: bridge
+volumes:
+  cnc-killer-vol-db:
+    driver : local

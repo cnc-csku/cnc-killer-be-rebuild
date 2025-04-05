@@ -1,15 +1,15 @@
 [build]
 # General build options
-bin = "bin/recruiting-web-backend"                                 # Binary output location
+bin = "bin/cnc-killer-rebuild"                                 # Binary output location
 
-cmd = "go build -o ./bin/recruiting-web-backend ./main.go" # Build command
-# Full list of files/directories to watch for changes
-include_ext = ["go", "tpl", "tmpl", "html"]
+cmd = "go build -o ./bin/cnc-killer-rebuild ./main.go" # Build command
+
+include_ext = ["go"]
 exclude_dir = ["vendor", "bin", "scripts"]
 exclude_file = []
 
 # Watching files
-watch_dir = ["cmd", "internal", "pkg", "web"]
+watch_dir = ["cmd", "internal"]
 # Main binary
 main = "cmd/app/main.go"
 
