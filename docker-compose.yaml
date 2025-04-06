@@ -9,27 +9,45 @@ services:
     working_dir: /app
     ports:
       - ${PORT}:${PORT}
-    networks:
-      - cnc-killer-network
     depends_on:
       - postgres
+    networks:
+      - cnc-killer-network
+
   postgres:
     image: postgres:16-alpine
-    restart : on-failure
+    restart: on-failure
     volumes:
       - cnc-killer-vol-db:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
-      TZ:  ${TIMEZONE}
+      TZ: Asia/Bangkok
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "5430:5432"
     networks:
       - cnc-killer-network
-networks:
-  cnc-killer-network:
-    driver: bridge
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_PASSWORD}
+    volumes:
+      - cnc-killer-vol-pgadmin:/var/lib/pgadmin
+    networks:
+      - cnc-killer-network
 volumes:
   cnc-killer-vol-db:
-    driver : local
+    driver: local
+  cnc-killer-vol-pgadmin:
+    driver: local
+networks:
+  cnc-killer-network:

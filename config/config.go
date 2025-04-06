@@ -15,7 +15,7 @@ type Config struct {
 	DBUsername string `env:"DB_USERNAME"`
 	DBPassword string `env:"DB_PASSWORD"`
 	DBDatabase string `env:"DB_DATABASE"`
-	SSLMode    string `env:"SSL_MODE"`
+	DBSSLMode  string `env:"DB_SSL_MODE"`
 }
 
 func NewConfig() Config {
