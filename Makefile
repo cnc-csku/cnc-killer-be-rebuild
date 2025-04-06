@@ -1,13 +1,11 @@
 include .env
 
-DB_URI="postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=$(DB_SSL_MODE)"
+DB_URI="postgresql://$(DB_USERNAME):$(DB_PASSWORD)@localhost:$(DB_PORT)/$(DB_DATABASE)?sslmode=$(DB_SSL_MODE)"
 MIGRATIONS_PATH=internal/migrations
 step=1
-re-docker:
-	docker compose down && docker compose up -d --build
-migrate-make:
+migrate-create:
 	migrate create -ext=sql -dir=$(MIGRATIONS_PATH) -tz "UTC" $(name)
-migrate-schema:
+migrate-all:
 	migrate -path=$(MIGRATIONS_PATH) -database $(DB_URI) -verbose up
 migrate-up:
 	migrate -path=$(MIGRATIONS_PATH) -database $(DB_URI) -verbose up $(step)
