@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/config"
+	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/rest"
+	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/routes"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,7 +21,11 @@ func main() {
 	})
 
 	db := config.ConnectDatabase(cfg, ctx)
-	print(db)
+	defer db.Close()
+	handler := rest.InitHandler(db)
+
+	routes.UserRoutes(app, handler)
+
 	if err := app.Listen(fmt.Sprintf(":%d", cfg.Port)); err != nil {
 		panic(err)
 	}

@@ -19,4 +19,5 @@ func ConnectDatabase(cfg Config, ctx context.Context) *sqlx.DB {
 	}
 
 	return db
+
 }
