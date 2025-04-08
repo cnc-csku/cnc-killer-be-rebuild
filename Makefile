@@ -1,6 +1,6 @@
 include .env
 
-DB_URI="postgresql://$(DB_USERNAME):$(DB_PASSWORD)@localhost:5430/$(DB_DATABASE)?sslmode=$(DB_SSL_MODE)"
+DB_URI="postgresql://$(DB_USERNAME):$(DB_PASSWORD)@localhost:$(EXTERNAL_DB_PORT)/$(DB_DATABASE)?sslmode=$(DB_SSL_MODE)"
 MIGRATIONS_PATH=internal/migrations
 step=1
 migrate-create:
