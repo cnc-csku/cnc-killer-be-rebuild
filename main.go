@@ -7,7 +7,6 @@ import (
 	"github.com/cnc-csku/cnc-killer-be-rebuild/config"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/rest"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/routes"
-	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/manager"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -25,8 +24,7 @@ func main() {
 	defer db.Close()
 	handler := rest.InitHandler(db)
 
-	game := manager.NewGame()
-	routes.ManagerRoutes(app, game)
+	routes.ManagerRoutes(app, handler)
 	routes.UserRoutes(app, handler)
 
 	if err := app.Listen(fmt.Sprintf(":%d", cfg.Port)); err != nil {
