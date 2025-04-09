@@ -1,61 +1,69 @@
 package manager
 
 import (
-	"encoding/json"
 	"log"
 
-	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
-	"github.com/fasthttp/websocket"
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
+	"github.com/gofiber/contrib/websocket"
+	"github.com/gofiber/fiber/v2"
 )
 
-func (g *Game) HandlerBoardcast() error {
-	for {
-		msg := <-g.Broadcast
+type GameHandler interface {
+	ChangeGameStatus(c *fiber.Ctx) error
+	SubscribePlater(c *websocket.Conn)
+}
 
-		msgBytes, err := json.Marshal(msg)
-		if err != nil {
-			return exceptions.ErrConvertJSON
-		}
+type gameHandler struct {
+	service GameService
+}
 
-		g.GameMux.RLock()
-
-		for _, player := range g.Players {
-			err := player.Conn.WriteMessage(websocket.TextMessage, msgBytes)
-			if err != nil {
-				log.Printf("Error sending message to player %s: %v", player.ID, err)
-				return err
-			}
-		}
-
-		g.GameMux.RUnlock()
-		log.Printf("Broadcasted message of type '%s' to %d players", msg.Type, len(g.Players))
+func NewGameHandler(service GameService) GameHandler {
+	return &gameHandler{
+		service: service,
 	}
 }
 
-// HandlerPlayerMessage implements GameService.
-func (g *Game) HandlerPlayerMessage(userID string, msgBytes []byte) error {
-	var msg map[string]interface{}
-	if err := json.Unmarshal(msgBytes, &msg); err != nil {
+// ChangeGameStatus implements GameHandler.
+func (g *gameHandler) ChangeGameStatus(c *fiber.Ctx) error {
+	var body requests.GameStatusRequest
+	if err := c.BodyParser(&body); err != nil {
 		return err
 	}
-	msgType, ok := msg["type"].(string)
-	if !ok {
-		return exceptions.ErrInvalidType
-	}
-	switch msgType {
-	case MsgTypeUpdateStatus:
-		newStatus, ok := msg["content"].(string)
-		if !ok {
-			return exceptions.ErrInvalidRequest
-		}
-		g.ChangeGameStatus(newStatus)
-	case MsgTypeKill:
-		return nil
-	case MsgTypeRevive:
-		return nil
-	default:
-		return exceptions.ErrInvalidType
+
+	err := g.service.ChangeGameStatus(body.Status)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
 	}
 
-	return exceptions.ErrInvalidRequest
+	return c.JSON(fiber.Map{"status": g.service.GetGameStatus()})
+}
+
+// SubscribePlater implements GameHandler.
+func (g *gameHandler) SubscribePlater(c *websocket.Conn) {
+	playerID := c.Params("playerID")
+
+	err := g.service.AddPlayer(playerID, c)
+	if err != nil {
+		g.service.RemovePlayer(playerID)
+		c.WriteJSON(fiber.Map{
+			"message": "error while adding player",
+		})
+	}
+
+	for {
+		messageType, message, err := c.ReadMessage()
+		if err != nil {
+			log.Printf("Error reading message from player %s: %v", playerID, err)
+			g.service.RemovePlayer(playerID)
+			break
+		}
+
+		if messageType == websocket.TextMessage {
+			g.service.HandlePlayerMessage(playerID, message)
+		}
+	}
+
+	go g.service.HandleBoardcast()
 }
