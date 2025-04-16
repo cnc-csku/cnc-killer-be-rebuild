@@ -16,6 +16,9 @@ type Config struct {
 	DBPassword string `env:"DB_PASSWORD"`
 	DBDatabase string `env:"DB_DATABASE"`
 	DBSSLMode  string `env:"DB_SSL_MODE"`
+	// for google
+	GoogleClientID     string `env:"GOOGLE_CLIENT_ID"`
+	GoogleClientSecret string `env:"GOOGLE_CLIENT_SECRET"`
 }
 
 func NewConfig() Config {
