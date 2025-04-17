@@ -14,18 +14,23 @@ func main() {
 	cfg := config.NewConfig()
 	ctx := context.Background()
 	app := fiber.New()
+
+	db := config.ConnectDatabase(cfg, ctx)
+	googleCfg := config.NewGoogleConfig(cfg)
+
+	defer db.Close()
+
+	handler := rest.InitHandler(db, googleCfg)
+
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"message": "connected",
 		})
 	})
 
-	db := config.ConnectDatabase(cfg, ctx)
-	defer db.Close()
-	handler := rest.InitHandler(db)
-
 	routes.ManagerRoutes(app, handler)
 	routes.UserRoutes(app, handler)
+	routes.AuthRoute(app, handler)
 
 	if err := app.Listen(fmt.Sprintf(":%d", cfg.Port)); err != nil {
 		panic(err)

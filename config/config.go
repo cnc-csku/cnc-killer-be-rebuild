@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/caarlos0/env/v11"
@@ -19,6 +20,7 @@ type Config struct {
 	// for google
 	GoogleClientID     string `env:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret string `env:"GOOGLE_CLIENT_SECRET"`
+	RedirectURL        string `env:"REDIRECT_URL"`
 }
 
 func NewConfig() Config {
@@ -29,6 +31,8 @@ func NewConfig() Config {
 	if err != nil {
 		log.Fatal("error while try to parse .env file")
 	}
+
+	fmt.Printf("env's redirect url : %s", cfg.RedirectURL)
 
 	return cfg
 }

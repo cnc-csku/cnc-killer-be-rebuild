@@ -5,22 +5,27 @@ import (
 	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/postgres"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/manager"
 	"github.com/jmoiron/sqlx"
+	"golang.org/x/oauth2"
 )
 
 type Handler struct {
-	UserHandler    UserHandler
-	ManagerHandler manager.GameHandler
+	UserHandler       UserHandler
+	GoogleAuthHandler GoogleAuthHandler
+	ManagerHandler    manager.GameHandler
 }
 
-func InitHandler(db *sqlx.DB) *Handler {
+func InitHandler(db *sqlx.DB, googleCfg oauth2.Config) *Handler {
 	userRepo := postgres.NewUserDatabase(db)
 	userService := services.NewUserService(userRepo)
 	userHandler := NewUserHandler(userService)
 
 	managerService := manager.NewGame()
 	managerHandler := manager.NewGameHandler(managerService)
+
+	googleAuthHandler := NewGoogleAuthHandler(googleCfg)
 	return &Handler{
-		UserHandler:    userHandler,
-		ManagerHandler: managerHandler,
+		UserHandler:       userHandler,
+		GoogleAuthHandler: googleAuthHandler,
+		ManagerHandler:    managerHandler,
 	}
 }
