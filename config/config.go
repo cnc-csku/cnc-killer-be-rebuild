@@ -23,7 +23,7 @@ type Config struct {
 	RedirectURL        string `env:"REDIRECT_URL"`
 }
 
-func NewConfig() Config {
+func NewConfig() *Config {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("env file not found 🚨")
 	}
@@ -34,5 +34,5 @@ func NewConfig() Config {
 
 	fmt.Printf("env's redirect url : %s", cfg.RedirectURL)
 
-	return cfg
+	return &cfg
 }

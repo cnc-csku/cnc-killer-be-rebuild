@@ -7,7 +7,13 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-func NewGoogleConfig(cfg Config) oauth2.Config {
+type GoogleAuthConfig struct {
+	AuthConfig *oauth2.Config
+	Config     *Config
+	States     map[string]bool
+}
+
+func NewGoogleConfig(cfg *Config) *GoogleAuthConfig {
 	if cfg.GoogleClientID == "" || cfg.GoogleClientSecret == "" {
 		log.Fatal("error google client ID or google client secret not foud ❌⛔️")
 	}
@@ -16,14 +22,17 @@ func NewGoogleConfig(cfg Config) oauth2.Config {
 		log.Fatal("Redirect URL not found")
 	}
 
-	config := oauth2.Config{
-		RedirectURL:  cfg.RedirectURL,
-		ClientID:     cfg.GoogleClientID,
-		ClientSecret: cfg.GoogleClientSecret,
-		Scopes: []string{"https://www.googleapis.com/auth/userinfo.email",
-			"https://www.googleapis.com/auth/userinfo.profile"},
-		Endpoint: google.Endpoint,
-	}
+	return &GoogleAuthConfig{
+		AuthConfig: &oauth2.Config{
+			RedirectURL:  cfg.RedirectURL,
+			ClientID:     cfg.GoogleClientID,
+			ClientSecret: cfg.GoogleClientSecret,
+			Scopes: []string{"https://www.googleapis.com/auth/userinfo.email",
+				"https://www.googleapis.com/auth/userinfo.profile"},
+			Endpoint: google.Endpoint,
+		},
 
-	return config
+		Config: cfg,
+		States: make(map[string]bool),
+	}
 }

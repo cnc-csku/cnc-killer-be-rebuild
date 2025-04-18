@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/cnc-csku/cnc-killer-be-rebuild/config"
 	"github.com/gofiber/fiber/v2"
-	"golang.org/x/oauth2"
 )
 
 type GoogleAuthHandler interface {
@@ -15,10 +15,10 @@ type GoogleAuthHandler interface {
 }
 
 type googleAuthHandler struct {
-	GoogleCfg oauth2.Config
+	GoogleCfg *config.GoogleAuthConfig
 }
 
-func NewGoogleAuthHandler(cfg oauth2.Config) GoogleAuthHandler {
+func NewGoogleAuthHandler(cfg *config.GoogleAuthConfig) GoogleAuthHandler {
 	return googleAuthHandler{
 		GoogleCfg: cfg,
 	}
@@ -26,7 +26,7 @@ func NewGoogleAuthHandler(cfg oauth2.Config) GoogleAuthHandler {
 
 // GoogleLogin implements GoogleAuthHandler.
 func (g googleAuthHandler) GoogleLogin(c *fiber.Ctx) error {
-	url := g.GoogleCfg.AuthCodeURL("randomstate")
+	url := g.GoogleCfg.AuthConfig.AuthCodeURL("randomstate")
 
 	c.Status(fiber.StatusSeeOther)
 	c.Redirect(url)
@@ -44,7 +44,7 @@ func (g googleAuthHandler) GoogleCallback(c *fiber.Ctx) error {
 	ctx := context.Background()
 	code := c.Query("code")
 
-	token, err := g.GoogleCfg.Exchange(ctx, code)
+	token, err := g.GoogleCfg.AuthConfig.Exchange(ctx, code)
 
 	if err != nil {
 		return c.SendString("Code-Token Exchange Failed")
