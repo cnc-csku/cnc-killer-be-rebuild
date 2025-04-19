@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"log"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/config"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
@@ -71,7 +70,6 @@ func (g *GoogleAuthInstance) GetUserInfo(ctx context.Context, token *oauth2.Toke
 		return nil, err
 	}
 	err = json.Unmarshal(userData, &googleUser)
-	log.Printf("err : %s", err)
 	if err != nil {
 		return nil, err
 	}

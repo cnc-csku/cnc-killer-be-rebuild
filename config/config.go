@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/caarlos0/env/v11"
@@ -32,7 +31,7 @@ func NewConfig() *Config {
 		log.Fatal("error while try to parse .env file")
 	}
 
-	fmt.Printf("env's redirect url : %s", cfg.RedirectURL)
+	log.Printf("env's redirect url : %s", cfg.RedirectURL)
 
 	return &cfg
 }

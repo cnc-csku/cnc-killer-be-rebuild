@@ -1,18 +1,15 @@
 package services
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
-	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/responses"
+	"github.com/gofiber/fiber/v2"
 )
 
 type AuthService interface {
 	GetAuthURL() (string, error)
-	GetUserInfo(req requests.GoogleAuthInfoRequest, ctx context.Context) (*responses.GoogleResponse, error)
+	GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, error)
 }
 
 type authServiceImpl struct {
@@ -27,7 +24,6 @@ func NewAuthService(repo repositories.AuthRepository) AuthService {
 
 // GetAuthURl implements AuthService.
 func (a *authServiceImpl) GetAuthURL() (string, error) {
-	// fmt.Printf("call auth url")
 	state, err := a.repo.GenerateState()
 	if err != nil {
 		return "", err
@@ -36,20 +32,23 @@ func (a *authServiceImpl) GetAuthURL() (string, error) {
 }
 
 // GetUserInfo implements AuthService.
-func (a *authServiceImpl) GetUserInfo(req requests.GoogleAuthInfoRequest, ctx context.Context) (*responses.GoogleResponse, error) {
-	if req.State == "" {
+func (a *authServiceImpl) GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, error) {
+	ctx := c.Context()
+	state := c.Query("state")
+	if state == "" {
 		return nil, exceptions.ErrNoState
 	}
 
-	if validated := a.repo.VerifyState(req.State); !validated {
+	if validated := a.repo.VerifyState(state); !validated {
 		return nil, exceptions.ErrInvalidState
 	}
 
-	if req.Code == "" {
+	code := c.Query("code")
+	if code == "" {
 		return nil, exceptions.ErrCodeNotFound
 	}
 
-	token, err := a.repo.ExchangeCode(ctx, req.Code)
+	token, err := a.repo.ExchangeCode(ctx, code)
 
 	if err != nil {
 		return nil, exceptions.ErrExchangeFailed
@@ -58,7 +57,6 @@ func (a *authServiceImpl) GetUserInfo(req requests.GoogleAuthInfoRequest, ctx co
 	user, err := a.repo.GetUserInfo(ctx, token)
 
 	if err != nil {
-		fmt.Printf("error : %s", err.Error())
 		return nil, exceptions.ErrFetchGoogleUser
 	}
 

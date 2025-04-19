@@ -2,7 +2,6 @@ package rest
 
 import (
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
-	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/services"
 	"github.com/gofiber/fiber/v2"
 )
@@ -24,12 +23,7 @@ func NewGoogleAuthHandler(service services.AuthService) GoogleAuthHandler {
 
 // GoogleCallback implements GoogleAuthHandler.
 func (g googleAuthHandler) GoogleCallback(c *fiber.Ctx) error {
-	state := c.Query("state")
-	code := c.Query("code")
-	user, err := g.service.GetUserInfo(requests.GoogleAuthInfoRequest{
-		Code:  code,
-		State: state,
-	}, c.Context())
+	user, err := g.service.GetUserInfo(c)
 
 	if err != nil {
 		switch err {
