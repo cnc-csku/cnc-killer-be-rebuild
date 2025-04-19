@@ -27,7 +27,7 @@ func NewAuthService(repo repositories.AuthRepository) AuthService {
 
 // GetAuthURl implements AuthService.
 func (a *authServiceImpl) GetAuthURL() (string, error) {
-	fmt.Printf("call auth url")
+	// fmt.Printf("call auth url")
 	state, err := a.repo.GenerateState()
 	if err != nil {
 		return "", err
@@ -58,6 +58,7 @@ func (a *authServiceImpl) GetUserInfo(req requests.GoogleAuthInfoRequest, ctx co
 	user, err := a.repo.GetUserInfo(ctx, token)
 
 	if err != nil {
+		fmt.Printf("error : %s", err.Error())
 		return nil, exceptions.ErrFetchGoogleUser
 	}
 

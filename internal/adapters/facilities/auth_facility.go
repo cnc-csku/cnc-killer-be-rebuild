@@ -3,6 +3,8 @@ package facilities
 import (
 	"context"
 	"encoding/json"
+	"io"
+	"log"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/config"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
@@ -34,13 +36,14 @@ func (g *GoogleAuthInstance) GenerateState() (string, error) {
 
 // GetAuthURL implements repositories.AuthRepository.
 func (g *GoogleAuthInstance) GetAuthURL(state string) string {
+	g.GoogleAuth.States[state] = true
 	return g.GoogleAuth.AuthConfig.AuthCodeURL(state)
 }
 
 // VerifyState implements repositories.AuthRepository.
 func (g *GoogleAuthInstance) VerifyState(state string) bool {
-	if _, ok := g.GoogleAuth.States[state]; ok {
-		// delete(g.GoogleAuth.States, state)
+	if g.GoogleAuth.States[state] {
+		delete(g.GoogleAuth.States, state)
 		return true
 	} else {
 		return false
@@ -56,17 +59,23 @@ func (g *GoogleAuthInstance) ExchangeCode(ctx context.Context, code string) (*oa
 func (g *GoogleAuthInstance) GetUserInfo(ctx context.Context, token *oauth2.Token) (*models.Google, error) {
 	client := g.GoogleAuth.AuthConfig.Client(ctx, token)
 	res, err := client.Get(userInfoURL)
-	defel res.Body.Close()
 
 	if err != nil {
 		return nil, err
 	}
-	var googleUser *models.Google
-	err = json.NewDecoder(res.Body).Decode(googleUser)
+
+	defer res.Body.Close()
+	var googleUser models.Google
+	userData, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(userData, &googleUser)
+	log.Printf("err : %s", err)
 	if err != nil {
 		return nil, err
 	}
 
-	return googleUser, nil
+	return &googleUser, nil
 
 }
