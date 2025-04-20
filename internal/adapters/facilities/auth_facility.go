@@ -16,8 +16,6 @@ type GoogleAuthInstance struct {
 	GoogleAuth *config.GoogleAuthConfig
 }
 
-var userInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo"
-
 func NewGoogleAuthInstance(cfg *config.GoogleAuthConfig) repositories.AuthRepository {
 	return &GoogleAuthInstance{
 		GoogleAuth: cfg,
@@ -57,7 +55,7 @@ func (g *GoogleAuthInstance) ExchangeCode(ctx context.Context, code string) (*oa
 // GetUserInfo implements repositories.AuthRepository.
 func (g *GoogleAuthInstance) GetUserInfo(ctx context.Context, token *oauth2.Token) (*models.Google, error) {
 	client := g.GoogleAuth.AuthConfig.Client(ctx, token)
-	res, err := client.Get(userInfoURL)
+	res, err := client.Get(g.GoogleAuth.Config.UserInfoURL)
 
 	if err != nil {
 		return nil, err

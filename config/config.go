@@ -19,6 +19,7 @@ type Config struct {
 	// for google
 	GoogleClientID     string `env:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret string `env:"GOOGLE_CLIENT_SECRET"`
+	UserInfoURL        string `env:"GOOGLE_USER_INFO_URL"`
 	RedirectURL        string `env:"REDIRECT_URL"`
 }
 
