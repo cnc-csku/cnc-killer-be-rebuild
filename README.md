@@ -45,4 +45,11 @@ make migrate-create name="your migration name"
 ### Tips 
 in our project use something calls  `Hexagonal architecture` this is architecture that help us to decouple our code as module
 
+in this project contains 2 important directory 
 
+1) `core` directory , use to store `port` in hexagonal architecture in this case is using to store `interface` in core contain's 3 main sub directory 
+    
+    - `repository` is use to store `secondary-port` or store interface that use for `core` activity in our application
+    - `services` is use to store `primary-port` or store interface of `business logic` of our application
+    - `models` is use to defined how to contract between port
+2) `adaptors` directory, use to store implementation of interface and store "adaptors" to tranfer data through each level of port
