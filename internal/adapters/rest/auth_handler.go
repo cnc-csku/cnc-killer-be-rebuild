@@ -16,13 +16,13 @@ type googleAuthHandler struct {
 }
 
 func NewGoogleAuthHandler(service services.AuthService) GoogleAuthHandler {
-	return googleAuthHandler{
+	return &googleAuthHandler{
 		service: service,
 	}
 }
 
 // GoogleCallback implements GoogleAuthHandler.
-func (g googleAuthHandler) GoogleCallback(c *fiber.Ctx) error {
+func (g *googleAuthHandler) GoogleCallback(c *fiber.Ctx) error {
 	user, err := g.service.GetUserInfo(c)
 
 	if err != nil {
@@ -56,7 +56,7 @@ func (g googleAuthHandler) GoogleCallback(c *fiber.Ctx) error {
 }
 
 // GoogleLogin implements GoogleAuthHandler.
-func (g googleAuthHandler) GoogleLogin(c *fiber.Ctx) error {
+func (g *googleAuthHandler) GoogleLogin(c *fiber.Ctx) error {
 	authURL, err := g.service.GetAuthURL()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

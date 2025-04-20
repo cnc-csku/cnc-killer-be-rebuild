@@ -16,7 +16,7 @@ type UserService interface {
 }
 
 func NewUserService(repo repositories.UserRepository) UserService {
-	return userServiceImpl{
+	return &userServiceImpl{
 		repo: repo,
 	}
 }
@@ -26,7 +26,7 @@ type userServiceImpl struct {
 }
 
 // GetUserRole implements UserService.
-func (u userServiceImpl) GetUserRole(ctx context.Context, userID string) (*responses.RoleResponse, error) {
+func (u *userServiceImpl) GetUserRole(ctx context.Context, userID string) (*responses.RoleResponse, error) {
 	err := uuid.Validate(userID)
 	if err != nil {
 		return nil, exceptions.ErrInvalidUUID
@@ -42,6 +42,6 @@ func (u userServiceImpl) GetUserRole(ctx context.Context, userID string) (*respo
 }
 
 // Login implements UserService.
-func (u userServiceImpl) Login(ctx context.Context, req requests.UserLoginRequest) (*responses.UserResponse, error) {
+func (u *userServiceImpl) Login(ctx context.Context, req requests.UserLoginRequest) (*responses.UserResponse, error) {
 	panic("unimplemented")
 }
