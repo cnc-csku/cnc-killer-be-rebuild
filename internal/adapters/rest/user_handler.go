@@ -51,7 +51,7 @@ func (u *userHandler) Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(&req); err != nil {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
-	user, err := u.service.Login(c.Context(), req)
+	user, err := u.service.Login(c.Context(), &req)
 	switch err {
 	case exceptions.ErrUnauthorized:
 		return c.SendStatus(fiber.StatusUnauthorized)

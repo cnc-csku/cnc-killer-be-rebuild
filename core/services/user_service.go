@@ -12,7 +12,7 @@ import (
 
 type UserService interface {
 	GetUserRole(ctx context.Context, userID string) (*responses.RoleResponse, error)
-	Login(ctx context.Context, req requests.UserLoginRequest) (*responses.UserResponse, error)
+	Login(ctx context.Context, req *requests.UserLoginRequest) (*responses.UserResponse, error)
 }
 
 func NewUserService(repo repositories.UserRepository) UserService {
@@ -42,6 +42,6 @@ func (u *userServiceImpl) GetUserRole(ctx context.Context, userID string) (*resp
 }
 
 // Login implements UserService.
-func (u *userServiceImpl) Login(ctx context.Context, req requests.UserLoginRequest) (*responses.UserResponse, error) {
+func (u *userServiceImpl) Login(ctx context.Context, req *requests.UserLoginRequest) (*responses.UserResponse, error) {
 	panic("unimplemented")
 }

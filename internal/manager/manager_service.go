@@ -44,7 +44,7 @@ func (g *Game) AddPlayer(userID string, conn *websocket.Conn) error {
 
 	statusMsg := Message{
 		Type:    "status",
-		Content: JsonMap{"status": g.Status},
+		Content: JSON{"status": g.Status},
 	}
 
 	msgBytes, err := json.Marshal(statusMsg)
@@ -75,7 +75,7 @@ func (g *Game) ChangeGameStatus(newStatus string) error {
 
 	statusMsg := Message{
 		Type: MsgTypeUpdateStatus,
-		Content: JsonMap{
+		Content: JSON{
 			"status": newStatus,
 		},
 	}

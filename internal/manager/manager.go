@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/contrib/websocket"
 )
 
-type JsonMap map[string]string
+type JSON map[string]interface{}
 
 const (
 	GameStatusWaiting = "waiting"
