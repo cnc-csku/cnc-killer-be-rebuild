@@ -1,30 +1,31 @@
-package manager
+package handlers
 
 import (
 	"log"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/services"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
 
-type GameHandler interface {
+type ManagerHandler interface {
 	ChangeGameStatus(c *fiber.Ctx) error
-	SubscribePlater(c *websocket.Conn)
+	SubscribePlayer(c *websocket.Conn)
 }
 
-type gameHandler struct {
-	service GameService
+type managerHandler struct {
+	service services.ManagerService
 }
 
-func NewGameHandler(service GameService) GameHandler {
-	return &gameHandler{
+func NewManagerHandler(service services.ManagerService) ManagerHandler {
+	return &managerHandler{
 		service: service,
 	}
 }
 
 // ChangeGameStatus implements GameHandler.
-func (g *gameHandler) ChangeGameStatus(c *fiber.Ctx) error {
+func (g *managerHandler) ChangeGameStatus(c *fiber.Ctx) error {
 	var body requests.GameStatusRequest
 	if err := c.BodyParser(&body); err != nil {
 		return err
@@ -37,20 +38,29 @@ func (g *gameHandler) ChangeGameStatus(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{"status": g.service.GetGameStatus()})
+	return c.SendStatus(fiber.StatusOK)
 }
 
-// SubscribePlater implements GameHandler.
-func (g *gameHandler) SubscribePlater(c *websocket.Conn) {
+// SubscribePlayer implements ManagerHandler.
+func (g *managerHandler) SubscribePlayer(c *websocket.Conn) {
 	playerID := c.Params("playerID")
 
-	err := g.service.AddPlayer(playerID, c)
+	msg, err := g.service.AddPlayer(playerID, c)
 	if err != nil {
 		g.service.RemovePlayer(playerID)
 		c.WriteJSON(fiber.Map{
 			"message": "error while adding player",
 		})
+		return
 	}
+
+	if err := c.WriteJSON(msg); err != nil {
+		log.Printf("Error writing message to player %s: %v", playerID, err)
+		g.service.RemovePlayer(playerID)
+		return
+	}
+
+	go g.service.HandleBoardcast()
 
 	for {
 		messageType, message, err := c.ReadMessage()
@@ -64,6 +74,4 @@ func (g *gameHandler) SubscribePlater(c *websocket.Conn) {
 			g.service.HandlePlayerMessage(playerID, message)
 		}
 	}
-
-	go g.service.HandleBoardcast()
 }

@@ -6,10 +6,10 @@ import (
 )
 
 type ManagerRepository interface {
-	AddPlayer(playerID string, conn *websocket.Conn) (*models.Player, error)
+	AddPlayer(playerID string, conn *websocket.Conn) *models.Player
 	RemovePlayer(playerID string)
 	GetGameStatus() string
-	ChangeGameStatus(newStatus string) error
+	ChangeGameStatus(newStatus string)
 	Broadcast() error
 	PlayerMessageHandle(playerID string, msgBytes []byte) error
 }

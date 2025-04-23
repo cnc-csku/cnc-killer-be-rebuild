@@ -1,12 +1,12 @@
 package routes
 
 import (
-	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/rest"
+	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/handlers"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
 
-func ManagerRoutes(app *fiber.App, handler *rest.Handler) {
+func ManagerRoutes(app *fiber.App, handler *handlers.Handler) {
 	app.Use("/ws", func(c *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(c) {
 			c.Locals("allowed", true)
@@ -16,6 +16,6 @@ func ManagerRoutes(app *fiber.App, handler *rest.Handler) {
 	})
 	app.Post("/game/status", handler.ManagerHandler.ChangeGameStatus)
 	api := app.Group("/ws")
-	api.Get("/:playerID", websocket.New(handler.ManagerHandler.SubscribePlater))
+	api.Get("/:playerID", websocket.New(handler.ManagerHandler.SubscribePlayer))
 
 }

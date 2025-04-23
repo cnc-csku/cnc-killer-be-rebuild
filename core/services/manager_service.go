@@ -1,8 +1,7 @@
 package services
 
 import (
-	"log"
-
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
@@ -13,6 +12,9 @@ import (
 type ManagerService interface {
 	AddPlayer(playerID string, conn *websocket.Conn) (*responses.Message, error)
 	RemovePlayer(playerID string)
+	ChangeGameStatus(newStatus string) error
+	HandleBoardcast() error
+	HandlePlayerMessage(playerID string, msgBytes []byte) error
 }
 
 type managerServiceImpl struct {
@@ -27,12 +29,7 @@ func NewManagerService(repo repositories.ManagerRepository) ManagerService {
 
 // AddPlayer implements ManagerService.
 func (m *managerServiceImpl) AddPlayer(playerID string, conn *websocket.Conn) (*responses.Message, error) {
-	player, err := m.repo.AddPlayer(playerID, conn)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Printf("player id : %s has added", player.ID)
+	m.repo.AddPlayer(playerID, conn)
 
 	gameStatus := m.repo.GetGameStatus()
 
@@ -47,4 +44,24 @@ func (m *managerServiceImpl) AddPlayer(playerID string, conn *websocket.Conn) (*
 // RemovePlayer implements ManagerService.
 func (m *managerServiceImpl) RemovePlayer(playerID string) {
 	m.repo.RemovePlayer(playerID)
+}
+
+// ChangeGameStatus implements ManagerService.
+func (m *managerServiceImpl) ChangeGameStatus(newStatus string) error {
+	if _, ok := requests.ValidGameStatus[newStatus]; !ok {
+		return exceptions.ErrInvalidGameStatus
+	}
+
+	m.repo.ChangeGameStatus(newStatus)
+	return nil
+}
+
+// HandleBoardcast implements ManagerService.
+func (m *managerServiceImpl) HandleBoardcast() error {
+	return m.repo.Broadcast()
+}
+
+// HandlePlayerMessage implements ManagerService.
+func (m *managerServiceImpl) HandlePlayerMessage(playerID string, msgBytes []byte) error {
+	return m.repo.PlayerMessageHandle(playerID, msgBytes)
 }

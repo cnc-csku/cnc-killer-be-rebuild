@@ -1,4 +1,4 @@
-package rest
+package handlers
 
 import (
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"

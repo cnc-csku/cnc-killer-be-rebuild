@@ -1,18 +1,17 @@
-package rest
+package handlers
 
 import (
 	"github.com/cnc-csku/cnc-killer-be-rebuild/config"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/services"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/facilities"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/postgres"
-	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/manager"
 	"github.com/jmoiron/sqlx"
 )
 
 type Handler struct {
 	UserHandler       UserHandler
 	GoogleAuthHandler GoogleAuthHandler
-	ManagerHandler    manager.GameHandler
+	ManagerHandler    ManagerHandler
 }
 
 func InitHandler(db *sqlx.DB, googleCfg *config.GoogleAuthConfig) *Handler {
@@ -20,8 +19,10 @@ func InitHandler(db *sqlx.DB, googleCfg *config.GoogleAuthConfig) *Handler {
 	userService := services.NewUserService(userRepo)
 	userHandler := NewUserHandler(userService)
 
-	managerService := manager.NewGame()
-	managerHandler := manager.NewGameHandler(managerService)
+	game := config.NewGame()
+	managerRepo := facilities.NewManagerInstance(game)
+	managerService := services.NewManagerService(managerRepo)
+	managerHandler := NewManagerHandler(managerService)
 
 	authRepo := facilities.NewGoogleAuthInstance(googleCfg)
 	authService := services.NewAuthService(authRepo)

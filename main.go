@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/config"
-	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/rest"
+	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/handlers"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/internal/adapters/routes"
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,7 +20,7 @@ func main() {
 
 	defer db.Close()
 
-	handler := rest.InitHandler(db, googleCfg)
+	handler := handlers.InitHandler(db, googleCfg)
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
