@@ -61,7 +61,7 @@ func (a *authServiceImpl) GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, 
 	}
 
 	return &responses.GoogleResponse{
-		Name:       user.Name + " " + user.FamilyName,
+		Name:       user.Name,
 		Email:      user.Email,
 		PictureURL: user.PictureURL,
 	}, nil

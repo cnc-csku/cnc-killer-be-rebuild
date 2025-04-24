@@ -1,0 +1,3 @@
+ALTER TABLE users
+DROP COLUMN id_token,
+ADD COLUMN email TEXT;
