@@ -1,6 +1,8 @@
 package services
 
 import (
+	"log"
+
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/responses"
@@ -35,6 +37,8 @@ func (a *authServiceImpl) GetAuthURL() (string, error) {
 func (a *authServiceImpl) GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, error) {
 	ctx := c.Context()
 	state := c.Query("state")
+	redirect := c.Query("redirect_url")
+	log.Printf("%s", redirect)
 	if state == "" {
 		return nil, exceptions.ErrNoState
 	}

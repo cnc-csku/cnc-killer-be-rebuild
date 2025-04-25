@@ -7,3 +7,7 @@ type UserLoginRequest struct {
 type UserGetRoleRequest struct {
 	UserID string `json:"user_id"`
 }
+
+type CreateUserRequest struct {
+
+}
