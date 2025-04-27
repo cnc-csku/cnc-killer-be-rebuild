@@ -1,6 +1,13 @@
 # cnc-killer-be-rebuild
 for new cnc killer rebuild in go
 ## How to run project
+project requirements 
+1) docker 
+2) go
+3) golang migration
+
+please install before running this project
+
 first clone this project and install dependencies using 
 ```bash
 go mod tidy 
@@ -11,7 +18,13 @@ then you have to create `.env` file in your local machine we have some example i
 or if you want to try our project immediately you can try this
 ```bash
 cp ./.env.example ./.env
+
+# current version are require google oauth 
+# so you can't run your project immediately
+# please fill 
+# GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET before running project
 ```
+
 
 after you have create `.env` you can try
 ```bash
@@ -40,6 +53,11 @@ make migrate-down # for migrate down 1 step
 if you want to create your own migrations you can try this
 ```bash
 make migrate-create name="your migration name"
+```
+
+if you have problem `dirty version` in migration you can do this to fix
+```bash
+make migrate-force version="your latest version"
 ```
 
 ### Tips 
