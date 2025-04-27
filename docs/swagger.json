@@ -1,0 +1,27 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "this is for cnc killer backend",
+        "title": "cnc-killer-api",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8000",
+    "basePath": "/",
+    "paths": {
+        "/auth/google": {
+            "get": {
+                "description": "login with google",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "login",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,18 @@
+basePath: /
+host: localhost:8000
+info:
+  contact: {}
+  description: this is for cnc killer backend
+  title: cnc-killer-api
+  version: "1.0"
+paths:
+  /auth/google:
+    get:
+      description: login with google
+      responses:
+        "200":
+          description: OK
+      summary: login
+      tags:
+      - Auth
+swagger: "2.0"

@@ -56,6 +56,12 @@ func (g *googleAuthHandler) GoogleCallback(c *fiber.Ctx) error {
 }
 
 // GoogleLogin implements GoogleAuthHandler.
+
+// @Tags Auth
+// @Summary login
+// @Description login with google
+// @Success 200
+// @Router /auth/google [get]
 func (g *googleAuthHandler) GoogleLogin(c *fiber.Ctx) error {
 	authURL, err := g.service.GetAuthURL()
 	if err != nil {
