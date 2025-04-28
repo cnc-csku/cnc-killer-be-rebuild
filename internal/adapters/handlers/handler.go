@@ -25,7 +25,7 @@ func InitHandler(db *sqlx.DB, googleCfg *config.GoogleAuthConfig) *Handler {
 	managerHandler := NewManagerHandler(managerService)
 
 	authRepo := facilities.NewGoogleAuthInstance(googleCfg)
-	authService := services.NewAuthService(authRepo)
+	authService := services.NewAuthService(authRepo, userRepo)
 	googleAuthHandler := NewGoogleAuthHandler(authService)
 	return &Handler{
 		UserHandler:       userHandler,

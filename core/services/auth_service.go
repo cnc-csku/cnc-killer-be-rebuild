@@ -15,35 +15,37 @@ type AuthService interface {
 }
 
 type authServiceImpl struct {
-	repo repositories.AuthRepository
+	authRepo repositories.AuthRepository
+	userRepo repositories.UserRepository
 }
 
-func NewAuthService(repo repositories.AuthRepository) AuthService {
+func NewAuthService(authRepo repositories.AuthRepository, userRepo repositories.UserRepository) AuthService {
 	return &authServiceImpl{
-		repo: repo,
+		authRepo: authRepo,
+		userRepo: userRepo,
 	}
 }
 
 // GetAuthURl implements AuthService.
 func (a *authServiceImpl) GetAuthURL() (string, error) {
-	state, err := a.repo.GenerateState()
+	state, err := a.authRepo.GenerateState()
 	if err != nil {
 		return "", err
 	}
-	return a.repo.GetAuthURL(state), nil
+	return a.authRepo.GetAuthURL(state), nil
 }
 
 // GetUserInfo implements AuthService.
 func (a *authServiceImpl) GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, error) {
 	ctx := c.Context()
 	state := c.Query("state")
-	redirect := c.Query("redirect_url")
+	redirect := c.Query("redirect_url") // search param have to be send before api calling
 	log.Printf("%s", redirect)
 	if state == "" {
 		return nil, exceptions.ErrNoState
 	}
 
-	if validated := a.repo.VerifyState(state); !validated {
+	if validated := a.authRepo.VerifyState(state); !validated {
 		return nil, exceptions.ErrInvalidState
 	}
 
@@ -52,22 +54,35 @@ func (a *authServiceImpl) GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, 
 		return nil, exceptions.ErrCodeNotFound
 	}
 
-	token, err := a.repo.ExchangeCode(ctx, code)
+	token, err := a.authRepo.ExchangeCode(ctx, code)
 
 	if err != nil {
 		return nil, exceptions.ErrExchangeFailed
 	}
 
-	user, err := a.repo.GetUserInfo(ctx, token)
+	googleUser, err := a.authRepo.GetUserInfo(ctx, token)
 
 	if err != nil {
 		return nil, exceptions.ErrFetchGoogleUser
 	}
 
+	user, err := a.userRepo.FindUserByEmail(ctx, googleUser.Email)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		err = a.userRepo.AddUser(ctx, googleUser.Email)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &responses.GoogleResponse{
-		Name:       user.Name,
-		Email:      user.Email,
-		PictureURL: user.PictureURL,
+		Name:       googleUser.Name,
+		Email:      googleUser.Email,
+		PictureURL: googleUser.PictureURL,
 	}, nil
 
 }
