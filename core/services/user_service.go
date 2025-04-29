@@ -5,14 +5,11 @@ import (
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
-	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/responses"
-	"github.com/google/uuid"
 )
 
 type UserService interface {
-	GetUserRole(ctx context.Context, userID string) (*responses.RoleResponse, error)
-	Login(ctx context.Context, req *requests.UserLoginRequest) (*responses.UserResponse, error)
+	GetUserRole(ctx context.Context, email string) (*responses.RoleResponse, error)
 }
 
 func NewUserService(repo repositories.UserRepository) UserService {
@@ -26,22 +23,16 @@ type userServiceImpl struct {
 }
 
 // GetUserRole implements UserService.
-func (u *userServiceImpl) GetUserRole(ctx context.Context, userID string) (*responses.RoleResponse, error) {
-	err := uuid.Validate(userID)
-	if err != nil {
-		return nil, exceptions.ErrInvalidUUID
-	}
-	user, err := u.repo.FindUserByID(ctx, userID)
+func (u *userServiceImpl) GetUserRole(ctx context.Context, email string) (*responses.RoleResponse, error) {
+	user, err := u.repo.FindUserByEmail(ctx, email)
 	if err != nil {
 		return nil, err
+	}
+	if user == nil {
+		return nil, exceptions.ErrUserNotFound
 	}
 
 	return &responses.RoleResponse{
 		Role: user.Role,
 	}, nil
-}
-
-// Login implements UserService.
-func (u *userServiceImpl) Login(ctx context.Context, req *requests.UserLoginRequest) (*responses.UserResponse, error) {
-	panic("unimplemented")
 }
