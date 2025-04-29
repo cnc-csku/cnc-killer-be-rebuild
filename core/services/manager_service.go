@@ -34,8 +34,8 @@ func (m *managerServiceImpl) AddPlayer(playerID string, conn *websocket.Conn) (*
 	gameStatus := m.repo.GetGameStatus()
 
 	return &responses.Message{
-		MessageType: requests.MsgTypeUpdateStatus,
-		Contents: models.JSON{
+		Type: requests.MsgTypeUpdateStatus,
+		Messages: models.JSON{
 			"status": gameStatus,
 		},
 	}, nil

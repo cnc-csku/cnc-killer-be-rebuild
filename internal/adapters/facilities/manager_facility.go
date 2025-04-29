@@ -61,7 +61,7 @@ func (m *ManagerInstance) Broadcast() error {
 		}
 
 		m.game.GameMux.RUnlock()
-		log.Printf("Broadcasted message of type '%s' to %d players", msg.MessageType, len(m.game.Players))
+		log.Printf("Broadcasted message of type '%s' to %d players", msg.Type, len(m.game.Players))
 	}
 }
 
@@ -69,10 +69,8 @@ func (m *ManagerInstance) Broadcast() error {
 func (m *ManagerInstance) ChangeGameStatus(newStatus string) {
 	m.game.Status = newStatus
 	statusMsg := responses.Message{
-		MessageType: requests.MsgTypeUpdateStatus,
-		Contents: models.JSON{
-			"status": newStatus,
-		},
+		Type:     requests.MsgTypeUpdateStatus,
+		Messages: models.JSON{"status": newStatus},
 	}
 
 	m.game.Broadcast <- statusMsg
