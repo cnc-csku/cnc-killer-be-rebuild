@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
@@ -18,17 +19,6 @@ func NewUserDatabase(db *sqlx.DB) repositories.UserRepository {
 	return &UserDatabase{
 		db: db,
 	}
-}
-
-// GetRole implements repositories.UserRepository.
-func (u *UserDatabase) FindUserByID(ctx context.Context, userID string) (*models.User, error) {
-	query := `SELECT * FROM users WHERE user_id = $1`
-	var user models.User
-	err := u.db.GetContext(ctx, &user, query, userID)
-	if err != nil {
-		return nil, err
-	}
-	return &user, nil
 }
 
 // AddUser implements repositories.UserRepository.
@@ -53,6 +43,9 @@ func (u *UserDatabase) FindUserByEmail(ctx context.Context, email string) (*mode
 	query := `SELECT * FROM users WHERE email = $1`
 	var user models.User
 	err := u.db.GetContext(ctx, &user, query, email)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}

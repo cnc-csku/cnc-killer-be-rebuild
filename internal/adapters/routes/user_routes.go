@@ -7,5 +7,5 @@ import (
 
 func UserRoutes(app *fiber.App, handler *handlers.Handler) {
 	api := app.Group("/user")
-	api.Post("/role", handler.UserHandler.GetRole)
+	api.Get("/role", handler.UserHandler.GetRole)
 }
