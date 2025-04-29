@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/responses"
 )
@@ -26,6 +27,9 @@ func (u *userServiceImpl) GetUserRole(ctx context.Context, email string) (*respo
 	user, err := u.repo.FindUserByEmail(ctx, email)
 	if err != nil {
 		return nil, err
+	}
+	if user == nil {
+		return nil, exceptions.ErrUserNotFound
 	}
 
 	return &responses.RoleResponse{
