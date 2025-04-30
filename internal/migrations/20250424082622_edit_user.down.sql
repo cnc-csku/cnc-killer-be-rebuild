@@ -1,5 +1,6 @@
 ALTER TABLE users
 ADD COLUMN id_token TEXT,
+DROP COLUMN refresh_token,
 ADD COLUMN user_id UUID;
 
 -- for droping current pk

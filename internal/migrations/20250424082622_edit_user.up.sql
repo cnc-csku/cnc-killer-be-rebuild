@@ -1,5 +1,6 @@
 ALTER TABLE users
 DROP COLUMN id_token,
+ADD COLUMN refresh_token TEXT,
 ADD COLUMN email TEXT;
 
 -- change primary key

@@ -73,16 +73,22 @@ func (a *authServiceImpl) GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, 
 	}
 
 	if user == nil {
-		err = a.userRepo.AddUser(ctx, googleUser.Email)
+		user, err = a.userRepo.AddUser(ctx, googleUser.Email)
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	signedToken, err := a.userRepo.GenerateAccessToken(user)
+	if err != nil {
+		return nil, err
 	}
 
 	return &responses.GoogleResponse{
 		Name:       googleUser.Name,
 		Email:      googleUser.Email,
 		PictureURL: googleUser.PictureURL,
+		Token:      signedToken,
 	}, nil
 
 }

@@ -53,16 +53,16 @@ func (g *GoogleAuthInstance) ExchangeCode(ctx context.Context, code string) (*oa
 }
 
 // GetUserInfo implements repositories.AuthRepository.
-func (g *GoogleAuthInstance) GetUserInfo(ctx context.Context, token *oauth2.Token) (*models.Google, error) {
+func (g *GoogleAuthInstance) GetUserInfo(ctx context.Context, token *oauth2.Token) (*models.GooglePayload, error) {
 	client := g.GoogleAuth.AuthConfig.Client(ctx, token)
-	res, err := client.Get(g.GoogleAuth.Config.UserInfoURL)
+	res, err := client.Get(g.GoogleAuth.Config.Google.UserInfoURL)
 
 	if err != nil {
 		return nil, err
 	}
 
 	defer res.Body.Close()
-	var googleUser models.Google
+	var googleUser models.GooglePayload
 	userData, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err

@@ -14,8 +14,8 @@ type Handler struct {
 	ManagerHandler    ManagerHandler
 }
 
-func InitHandler(db *sqlx.DB, googleCfg *config.GoogleAuthConfig) *Handler {
-	userRepo := postgres.NewUserDatabase(db)
+func InitHandler(db *sqlx.DB, cfg *config.Config, googleCfg *config.GoogleAuthConfig) *Handler {
+	userRepo := postgres.NewUserDatabase(db, cfg)
 	userService := services.NewUserService(userRepo)
 	userHandler := NewUserHandler(userService)
 

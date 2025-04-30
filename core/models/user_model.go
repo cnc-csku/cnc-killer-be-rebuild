@@ -1,9 +1,9 @@
 package models
 
 type User struct {
-	UserID string `db:"user_id"`
-	Email  string `db:"email"`
-	Role   string `db:"user_role"`
+	Email        string  `db:"email"`
+	Role         string  `db:"user_role"`
+	RefreshToken *string `db:"refresh_token"`
 }
 
 var RoleEnum = map[string]bool{

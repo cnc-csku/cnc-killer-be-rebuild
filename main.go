@@ -29,7 +29,7 @@ func main() {
 
 	defer db.Close()
 
-	handler := handlers.InitHandler(db, googleCfg)
+	handler := handlers.InitHandler(db, cfg, googleCfg)
 
 	app.Get("/swagger/*", swagger.HandlerDefault)
 	app.Get("/", func(c *fiber.Ctx) error {

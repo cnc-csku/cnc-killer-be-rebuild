@@ -11,7 +11,7 @@ import (
 
 func ConnectDatabase(cfg *Config, ctx context.Context) *sqlx.DB {
 	pgURI := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		cfg.DBHost, cfg.DBPort, cfg.DBUsername, cfg.DBPassword, cfg.DBDatabase, cfg.DBSSLMode)
+		cfg.DB.Host, cfg.DB.Port, cfg.DB.Username, cfg.DB.Password, cfg.DB.Database, cfg.DB.SSLMode)
 
 	db, err := sqlx.ConnectContext(ctx, "pgx", pgURI)
 	if err != nil {

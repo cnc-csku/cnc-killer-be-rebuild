@@ -8,6 +8,7 @@ import (
 
 type UserRepository interface {
 	FindUserByEmail(ctx context.Context, email string) (*models.User, error)
-	AddUser(ctx context.Context, email string) error
+	AddUser(ctx context.Context, email string) (*models.User, error)
 	UpdateUserRole(ctx context.Context, email string, newRole string) error
+	GenerateAccessToken(user *models.User) (string, error)
 }

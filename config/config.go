@@ -8,19 +8,31 @@ import (
 )
 
 type Config struct {
-	Port uint16 `env:"PORT"`
-	// for postgres
-	DBHost     string `env:"DB_HOST"`
-	DBPort     uint16 `env:"DB_PORT"`
-	DBUsername string `env:"DB_USERNAME"`
-	DBPassword string `env:"DB_PASSWORD"`
-	DBDatabase string `env:"DB_DATABASE"`
-	DBSSLMode  string `env:"DB_SSL_MODE"`
-	// for google
-	GoogleClientID     string `env:"GOOGLE_CLIENT_ID"`
-	GoogleClientSecret string `env:"GOOGLE_CLIENT_SECRET"`
-	UserInfoURL        string `env:"GOOGLE_USER_INFO_URL"`
-	RedirectURL        string `env:"REDIRECT_URL"`
+	Port   uint16       `env:"PORT"`
+	DB     DBConfig     `envPrefix:"DB_"`
+	Google GoogleConfig `envPrefix:"GOOGLE_"`
+	JWT    JWTConfig    `envPrefix:"JWT_"`
+}
+type DBConfig struct {
+	Host     string `env:"HOST"`
+	Port     uint16 `env:"PORT"`
+	Username string `env:"USERNAME"`
+	Password string `env:"PASSWORD"`
+	Database string `env:"DATABASE"`
+	SSLMode  string `env:"SSL_MODE"`
+}
+
+type GoogleConfig struct {
+	ClientID     string `env:"CLIENT_ID"`
+	ClientSecret string `env:"CLIENT_SECRET"`
+	UserInfoURL  string `env:"USER_INFO_URL"`
+	RedirectURL  string `env:"REDIRECT_URL"`
+}
+
+type JWTConfig struct {
+	Secret     string `env:"SECRET"`
+	AccessExp  string `env:"ACCESS_EXP"`
+	RefreshExp string `env:"REFRESH_EXP"`
 }
 
 func NewConfig() *Config {
@@ -31,8 +43,6 @@ func NewConfig() *Config {
 	if err != nil {
 		log.Fatal("error while try to parse .env file")
 	}
-
-	log.Printf("env's redirect url : %s", cfg.RedirectURL)
 
 	return &cfg
 }

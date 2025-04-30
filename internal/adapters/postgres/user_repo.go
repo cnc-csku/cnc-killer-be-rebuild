@@ -3,38 +3,39 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"time"
 
+	"github.com/cnc-csku/cnc-killer-be-rebuild/config"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
-	"github.com/google/uuid"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jmoiron/sqlx"
 )
 
 type UserDatabase struct {
-	db *sqlx.DB
+	config *config.Config
+	db     *sqlx.DB
 }
 
-func NewUserDatabase(db *sqlx.DB) repositories.UserRepository {
+func NewUserDatabase(db *sqlx.DB, cfg *config.Config) repositories.UserRepository {
 	return &UserDatabase{
-		db: db,
+		db:     db,
+		config: cfg,
 	}
 }
 
 // AddUser implements repositories.UserRepository.
-func (u *UserDatabase) AddUser(ctx context.Context, email string) error {
-	query := `INSERT INTO users (user_id , email , user_role) VALUES ($1, $2 , $3);`
-	userID, err := uuid.NewV7()
-	if err != nil {
-		return err
-	}
+func (u *UserDatabase) AddUser(ctx context.Context, email string) (*models.User, error) {
+	query := `INSERT INTO users (email , user_role) VALUES ($1, $2) RETURNING  *`
 	role := models.UserRoles.User
-	_, err = u.db.ExecContext(ctx, query, userID, email, role)
+	var user models.User
+	err := u.db.GetContext(ctx, &user, query, email, role)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &user, nil
 
 }
 
@@ -66,4 +67,28 @@ func (u *UserDatabase) UpdateUserRole(ctx context.Context, email string, newRole
 	}
 
 	return nil
+}
+
+// GenerateJWT implements repositories.UserRepository.
+func (u *UserDatabase) GenerateAccessToken(user *models.User) (string, error) {
+	duration, err := time.ParseDuration(u.config.JWT.AccessExp)
+	if err != nil {
+		return "", err
+	}
+
+	expire := time.Now().Add(duration).Unix()
+	claims := jwt.MapClaims{
+		"email": user.Email,
+		"role":  user.Role,
+		"exp":   expire,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := token.SignedString([]byte(u.config.JWT.AccessExp))
+	if err != nil {
+		return "", err
+	}
+
+	return signedToken, nil
+
 }
