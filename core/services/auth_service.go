@@ -79,7 +79,7 @@ func (a *authServiceImpl) GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, 
 		}
 	}
 
-	signedToken, err := a.userRepo.GenerateAccessToken(user)
+	signedToken, err := a.userRepo.GenerateAccessToken(user, true)
 	if err != nil {
 		return nil, err
 	}

@@ -10,5 +10,6 @@ type UserRepository interface {
 	FindUserByEmail(ctx context.Context, email string) (*models.User, error)
 	AddUser(ctx context.Context, email string) (*models.User, error)
 	UpdateUserRole(ctx context.Context, email string, newRole string) error
-	GenerateAccessToken(user *models.User) (string, error)
+	GenerateAccessToken(user *models.User, isAccessToken bool) (string, error)
+	GenerateRefreshToken(ctx context.Context, accessToken string) (string, error)
 }

@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"strconv"
 	"time"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/config"
@@ -70,12 +71,17 @@ func (u *UserDatabase) UpdateUserRole(ctx context.Context, email string, newRole
 }
 
 // GenerateJWT implements repositories.UserRepository.
-func (u *UserDatabase) GenerateAccessToken(user *models.User) (string, error) {
-	duration, err := time.ParseDuration(u.config.JWT.AccessExp)
+func (u *UserDatabase) GenerateAccessToken(user *models.User, isAccessToken bool) (string, error) {
+	var durationStr string
+	if isAccessToken {
+		durationStr = u.config.JWT.AccessExp
+	} else {
+		durationStr = u.config.JWT.RefreshExp
+	}
+	duration, err := time.ParseDuration(durationStr)
 	if err != nil {
 		return "", err
 	}
-
 	expire := time.Now().Add(duration).Unix()
 	claims := jwt.MapClaims{
 		"email": user.Email,
@@ -84,11 +90,62 @@ func (u *UserDatabase) GenerateAccessToken(user *models.User) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString([]byte(u.config.JWT.AccessExp))
+	signedToken, err := token.SignedString([]byte(u.config.JWT.Secret))
 	if err != nil {
 		return "", err
 	}
 
 	return signedToken, nil
+
+}
+
+// GenerateRefreshToken implements repositories.UserRepository.
+func (u *UserDatabase) GenerateRefreshToken(ctx context.Context, accessToken string) (string, error) {
+	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+		return []byte(u.config.JWT.Secret), nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	claims := token.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+	exp := claims["exp"].(string)
+	unixInt, err := strconv.ParseInt(exp, 10, 64)
+	if err != nil {
+		return "", err
+	}
+
+	if email == "" {
+		return "", exceptions.ErrEmailNotFound
+	}
+
+	user, err := u.FindUserByEmail(ctx, email)
+	if err != nil {
+		return "", err
+	}
+
+	if user == nil {
+		return "", exceptions.ErrUserNotFound
+	}
+
+	RefreshTokenStr, err := u.GenerateAccessToken(user, false)
+
+	if err != nil {
+		return "", err
+	}
+
+	query := `UPDATE users SET refresh_token = $1 WHERE email = $2;`
+	_, err = u.db.ExecContext(ctx, query, RefreshTokenStr, email)
+	if err != nil {
+		return "", err
+	}
+
+	if unixInt-time.Now().Unix() < 0 {
+		accessToken, err = u.GenerateAccessToken(user, true)
+	}
+
+	return accessToken, err
 
 }

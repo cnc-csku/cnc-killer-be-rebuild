@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"time"
+
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/services"
 	"github.com/gofiber/fiber/v2"
@@ -50,6 +52,12 @@ func (g *googleAuthHandler) GoogleCallback(c *fiber.Ctx) error {
 		}
 
 	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:    "token",
+		Value:   user.Token,
+		Expires: time.Now().Add(5 * time.Hour),
+	})
 
 	return c.Status(fiber.StatusOK).JSON(user)
 
