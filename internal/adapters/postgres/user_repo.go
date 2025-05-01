@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"strconv"
 	"time"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/config"
@@ -111,11 +110,7 @@ func (u *UserDatabase) GenerateRefreshToken(ctx context.Context, accessToken str
 
 	claims := token.Claims.(jwt.MapClaims)
 	email := claims["email"].(string)
-	exp := claims["exp"].(string)
-	unixInt, err := strconv.ParseInt(exp, 10, 64)
-	if err != nil {
-		return "", err
-	}
+	exp := int6(claims["exp"].(float64))
 
 	if email == "" {
 		return "", exceptions.ErrEmailNotFound
@@ -142,7 +137,7 @@ func (u *UserDatabase) GenerateRefreshToken(ctx context.Context, accessToken str
 		return "", err
 	}
 
-	if unixInt-time.Now().Unix() < 0 {
+	if exp-time.Now().Unix() < 0 {
 		accessToken, err = u.GenerateAccessToken(user, true)
 	}
 

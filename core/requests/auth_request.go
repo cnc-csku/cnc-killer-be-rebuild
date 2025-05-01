@@ -1,6 +1,5 @@
 package requests
 
-type GoogleAuthInfoRequest struct {
-	State string
-	Code  string
+type TokenRequest struct {
+	Token string `json:"token"`
 }

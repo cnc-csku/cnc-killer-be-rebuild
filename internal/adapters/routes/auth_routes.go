@@ -9,4 +9,5 @@ func AuthRoute(app *fiber.App, handler *handlers.Handler) {
 	api := app.Group("/auth")
 	api.Get("/google", handler.GoogleAuthHandler.GoogleLogin)
 	api.Get("/google/callback", handler.GoogleAuthHandler.GoogleCallback)
+	api.Post("/refresh", handler.GoogleAuthHandler.GetRefreshToken)
 }

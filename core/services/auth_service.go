@@ -1,10 +1,12 @@
 package services
 
 import (
+	"context"
 	"log"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/responses"
 	"github.com/gofiber/fiber/v2"
 )
@@ -12,6 +14,7 @@ import (
 type AuthService interface {
 	GetAuthURL() (string, error)
 	GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, error)
+	GetRefreshToken(ctx context.Context, req *requests.TokenRequest) (string, error)
 }
 
 type authServiceImpl struct {
@@ -91,4 +94,9 @@ func (a *authServiceImpl) GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, 
 		Token:      signedToken,
 	}, nil
 
+}
+
+// GetRefreshToken implements AuthService.
+func (a *authServiceImpl) GetRefreshToken(ctx context.Context, req *requests.TokenRequest) (string, error) {
+return a.userRepo.GenerateRefreshToken(ctx, req.Token)
 }

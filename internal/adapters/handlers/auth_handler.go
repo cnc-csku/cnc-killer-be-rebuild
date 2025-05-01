@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/services"
 	"github.com/gofiber/fiber/v2"
 )
@@ -11,6 +12,7 @@ import (
 type GoogleAuthHandler interface {
 	GoogleLogin(c *fiber.Ctx) error
 	GoogleCallback(c *fiber.Ctx) error
+	GetRefreshToken(c *fiber.Ctx) error
 }
 
 type googleAuthHandler struct {
@@ -81,4 +83,30 @@ func (g *googleAuthHandler) GoogleLogin(c *fiber.Ctx) error {
 	c.Status(fiber.StatusSeeOther)
 
 	return c.Redirect(authURL)
+}
+
+// GetRefreshToken implements GoogleAuthHandler.
+func (g *googleAuthHandler) GetRefreshToken(c *fiber.Ctx) error {
+	var req requests.TokenRequest
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+
+	token, err := g.service.GetRefreshToken(c.Context(), &req)
+	if err != nil {
+		switch err {
+		case exceptions.ErrEmailNotFound:
+		case exceptions.ErrUserNotFound:
+			return c.SendStatus(fiber.StatusBadRequest)
+		default:
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": err.Error(),
+			})
+		}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"access_token": token,
+	})
 }
