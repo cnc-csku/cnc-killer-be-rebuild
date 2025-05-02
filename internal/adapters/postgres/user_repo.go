@@ -110,7 +110,7 @@ func (u *UserDatabase) GenerateRefreshToken(ctx context.Context, accessToken str
 
 	claims := token.Claims.(jwt.MapClaims)
 	email := claims["email"].(string)
-	exp := int6(claims["exp"].(float64))
+	exp := int64(claims["exp"].(float64))
 
 	if email == "" {
 		return "", exceptions.ErrEmailNotFound
