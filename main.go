@@ -41,6 +41,7 @@ func main() {
 	routes.ManagerRoutes(app, handler)
 	routes.UserRoutes(app, handler)
 	routes.AuthRoute(app, handler)
+	routes.ActionRoutes(app, handler)
 
 	if err := app.Listen(fmt.Sprintf(":%d", cfg.Port)); err != nil {
 		panic(err)
