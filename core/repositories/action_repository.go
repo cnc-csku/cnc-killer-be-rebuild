@@ -7,6 +7,5 @@ import (
 )
 
 type ActionRepository interface {
-	// FindActionByID()
 	AddAction(ctx context.Context, action *models.Action) error
 }

@@ -20,7 +20,16 @@ func NewActionHandler(service services.ActionService) ActionHandler {
 	}
 }
 
-// Implementation of every methods in `ActionHandler`
+// AddAction handles the HTTP request to add a new action.
+// @Summary Add a new action
+// @Description Adds a new action with the provided details and condition.
+// @Tags Actions
+// @Accept json
+// @Produce json
+// @Param action body models.Action true "Action details"
+// @Success 200 {object} map[string]string "Action added successfully"
+// @Failure 400 {object} map[string]string "Error message"
+// @Router /action [post]
 func (a *actionHandler) AddAction(c *fiber.Ctx) error {
 	var action models.Action
 	if err := c.BodyParser(&action); err != nil {

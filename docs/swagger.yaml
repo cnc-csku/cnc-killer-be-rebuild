@@ -1,4 +1,14 @@
 basePath: /
+definitions:
+  models.Action:
+    properties:
+      condition:
+        type: string
+      detail:
+        type: string
+      id:
+        type: string
+    type: object
 host: localhost:8000
 info:
   contact: {}
@@ -6,6 +16,36 @@ info:
   title: cnc-killer-api
   version: "1.0"
 paths:
+  /action:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new action with the provided details and condition.
+      parameters:
+      - description: Action details
+        in: body
+        name: action
+        required: true
+        schema:
+          $ref: '#/definitions/models.Action'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Action added successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Error message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add a new action
+      tags:
+      - Actions
   /auth/google:
     get:
       description: login with google
