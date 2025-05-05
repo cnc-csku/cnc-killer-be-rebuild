@@ -25,7 +25,7 @@ func InitHandler(db *sqlx.DB, cfg *config.Config, googleCfg *config.GoogleAuthCo
 	managerService := services.NewManagerService(managerRepo)
 	managerHandler := NewManagerHandler(managerService)
 
-	actionRepo := postgres.NewActionDatabase(db, cfg)
+	actionRepo := postgres.NewActionDatabase(db)
 	actionService := services.NewActionService(actionRepo)
 	actionHandler := NewActionHandler(actionService)
 

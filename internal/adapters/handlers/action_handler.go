@@ -27,8 +27,8 @@ func (a *actionHandler) AddAction(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
-	if err := a.service.AddAction(c.Context(), &action); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+	if err := a.service.AddAction(c.Context(), action.Detail, action.Condition); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
