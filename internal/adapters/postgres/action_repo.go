@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
@@ -31,4 +32,18 @@ func (a *ActionDatabase) AddAction(ctx context.Context, action *models.Action) e
 	}
 
 	return nil
+}
+
+func (a *ActionDatabase) FindActionByID(ctx context.Context, actionID string) (*models.Action, error) {
+	var action models.Action
+	query := `SELECT * FROM actions WHERE action_id = $1`
+
+	if err := a.db.GetContext(ctx, &action, query, actionID); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, exceptions.ErrActionNotFound
+		}
+		return nil, err
+	}
+
+	return &action, nil
 }

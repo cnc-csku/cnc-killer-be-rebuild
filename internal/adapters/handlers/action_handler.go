@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"errors"
+
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/services"
 	"github.com/gofiber/fiber/v2"
@@ -8,6 +11,7 @@ import (
 
 type ActionHandler interface {
 	AddAction(c *fiber.Ctx) error
+	FindActionByID(c *fiber.Ctx) error
 }
 
 type actionHandler struct {
@@ -27,8 +31,9 @@ func NewActionHandler(service services.ActionService) ActionHandler {
 // @Accept json
 // @Produce json
 // @Param action body models.Action true "Action details"
-// @Success 200 {object} map[string]string "Action added successfully"
-// @Failure 400 {object} map[string]string "Error message"
+// @Success 200 {object} map[string]interface{} "Success response with action details"
+// @Failure 400 {object} map[string]interface{} "Invalid action data provided"
+// @Failure 500 {object} map[string]interface{} "Failed to add an action"
 // @Router /action [post]
 func (a *actionHandler) AddAction(c *fiber.Ctx) error {
 	var action models.Action
@@ -37,12 +42,67 @@ func (a *actionHandler) AddAction(c *fiber.Ctx) error {
 	}
 
 	if err := a.service.AddAction(c.Context(), action.Detail, action.Condition); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		switch {
+		case errors.Is(err, exceptions.ErrInvalidAction):
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"status":   "error",
+				"messsage": "Invalid action data provided",
+			})
+		default:
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Failed to add an action",
+			})
+		}
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "action added successfully",
+		"status": "success",
+		"data": fiber.Map{
+			"detail":    action.Detail,
+			"condition": action.Condition,
+		},
+	})
+}
+
+// FindActionByID handles the HTTP request to retrieve an action by its ID.
+// @Summary      Retrieve an action by ID
+// @Description  Fetches an action from the database using the provided ID.
+// @Tags         Actions
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Action ID"
+// @Success      200  {object}  map[string]interface{}  "Action retrieved successfully"
+// @Failure      400  {object}  map[string]interface{}  "Invalid action ID provided"
+// @Failure      404  {object}  map[string]interface{}  "Action not found"
+// @Failure      500  {object}  map[string]interface{}  "Internal server error"
+// @Router       /action/{id} [get]
+func (a *actionHandler) FindActionByID(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	action, err := a.service.FindActionByID(c.Context(), id)
+	if err != nil {
+		switch {
+		case errors.Is(err, exceptions.ErrEmptyActionID):
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"status": "error",
+				"error":  "Invalid action ID provided",
+			})
+		case errors.Is(err, exceptions.ErrActionNotFound):
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"status": "error",
+				"error":  "Action not found",
+			})
+		default:
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status": "success",
+		"data":   action,
 	})
 }

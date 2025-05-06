@@ -8,4 +8,5 @@ import (
 func ActionRoutes(app *fiber.App, handler *handlers.Handler) {
 	api := app.Group("/action")
 	api.Post("/", handler.ActionHandler.AddAction)
+	api.Get("/:id", handler.ActionHandler.FindActionByID)
 }

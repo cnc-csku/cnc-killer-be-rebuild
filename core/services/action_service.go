@@ -3,14 +3,15 @@ package services
 import (
 	"context"
 
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
 	"github.com/google/uuid"
 )
 
 type ActionService interface {
-	// FindActionByID
 	AddAction(ctx context.Context, actionDetail string, actionCondition string) error
+	FindActionByID(ctx context.Context, actionID string) (*models.Action, error)
 }
 
 type actionServiceImpl struct {
@@ -42,4 +43,17 @@ func (a *actionServiceImpl) AddAction(ctx context.Context, actionDetail string, 
 	}
 
 	return nil
+}
+
+func (a *actionServiceImpl) FindActionByID(ctx context.Context, actionID string) (*models.Action, error) {
+	if actionID == "" {
+		return nil, exceptions.ErrEmptyActionID
+	}
+
+	action, err := a.repo.FindActionByID(ctx, actionID)
+	if err != nil {
+		return nil, err
+	}
+
+	return action, nil
 }
