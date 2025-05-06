@@ -30,17 +30,17 @@ const docTemplate = `{
                 "summary": "Add a new action",
                 "parameters": [
                     {
-                        "description": "Action details",
-                        "name": "action",
+                        "description": "Add Action Request",
+                        "name": "req",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Action"
+                            "$ref": "#/definitions/requests.AddActionRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "Success response with action details",
                         "schema": {
                             "type": "object",
@@ -134,16 +134,13 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.Action": {
+        "requests.AddActionRequest": {
             "type": "object",
             "properties": {
-                "condition": {
+                "action_condition": {
                     "type": "string"
                 },
-                "detail": {
-                    "type": "string"
-                },
-                "id": {
+                "action_detail": {
                     "type": "string"
                 }
             }

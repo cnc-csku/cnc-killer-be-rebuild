@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
-	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/services"
 	"github.com/gofiber/fiber/v2"
 )
@@ -30,18 +30,28 @@ func NewActionHandler(service services.ActionService) ActionHandler {
 // @Tags Actions
 // @Accept json
 // @Produce json
-// @Param action body models.Action true "Action details"
-// @Success 200 {object} map[string]interface{} "Success response with action details"
+// @Param req body requests.AddActionRequest true "Add Action Request"
+// @Success 201 {object} map[string]interface{} "Success response with action details"
 // @Failure 400 {object} map[string]interface{} "Invalid action data provided"
 // @Failure 500 {object} map[string]interface{} "Failed to add an action"
 // @Router /action [post]
 func (a *actionHandler) AddAction(c *fiber.Ctx) error {
-	var action models.Action
-	if err := c.BodyParser(&action); err != nil {
-		return c.SendStatus(fiber.StatusBadRequest)
+	var req requests.AddActionRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Invalid request body",
+		})
 	}
 
-	if err := a.service.AddAction(c.Context(), action.Detail, action.Condition); err != nil {
+	if req.Detail == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Detail field is required",
+		})
+	}
+
+	if err := a.service.AddAction(c.Context(), &req); err != nil {
 		switch {
 		case errors.Is(err, exceptions.ErrInvalidAction):
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -56,12 +66,9 @@ func (a *actionHandler) AddAction(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"status": "success",
-		"data": fiber.Map{
-			"detail":    action.Detail,
-			"condition": action.Condition,
-		},
+		"data":   req,
 	})
 }
 

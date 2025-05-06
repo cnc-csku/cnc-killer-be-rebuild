@@ -6,11 +6,12 @@ import (
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
 	"github.com/google/uuid"
 )
 
 type ActionService interface {
-	AddAction(ctx context.Context, actionDetail string, actionCondition string) error
+	AddAction(ctx context.Context, req *requests.AddActionRequest) error
 	FindActionByID(ctx context.Context, actionID string) (*models.Action, error)
 }
 
@@ -25,7 +26,11 @@ func NewActionService(repo repositories.ActionRepository) ActionService {
 }
 
 // Implementation of every methods in `UserService`
-func (a *actionServiceImpl) AddAction(ctx context.Context, actionDetail string, actionCondition string) error {
+func (a *actionServiceImpl) AddAction(ctx context.Context, req *requests.AddActionRequest) error {
+	if req == nil {
+		return exceptions.ErrInvalidAction
+	}
+
 	// Generate a new UUID Version 7 for action_id
 	uuid, err := uuid.NewV7()
 	if err != nil {
@@ -34,8 +39,8 @@ func (a *actionServiceImpl) AddAction(ctx context.Context, actionDetail string, 
 
 	var action = models.Action{
 		ID:        uuid.String(),
-		Detail:    actionDetail,
-		Condition: actionCondition,
+		Detail:    req.Detail,
+		Condition: req.Condition,
 	}
 
 	if err := a.repo.AddAction(ctx, &action); err != nil {

@@ -1,12 +1,10 @@
 basePath: /
 definitions:
-  models.Action:
+  requests.AddActionRequest:
     properties:
-      condition:
+      action_condition:
         type: string
-      detail:
-        type: string
-      id:
+      action_detail:
         type: string
     type: object
 host: localhost:8000
@@ -22,16 +20,16 @@ paths:
       - application/json
       description: Adds a new action with the provided details and condition.
       parameters:
-      - description: Action details
+      - description: Add Action Request
         in: body
-        name: action
+        name: req
         required: true
         schema:
-          $ref: '#/definitions/models.Action'
+          $ref: '#/definitions/requests.AddActionRequest'
       produces:
       - application/json
       responses:
-        "200":
+        "201":
           description: Success response with action details
           schema:
             additionalProperties: true
