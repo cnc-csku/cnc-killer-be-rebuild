@@ -1,4 +1,12 @@
 basePath: /
+definitions:
+  requests.AddActionRequest:
+    properties:
+      action_condition:
+        type: string
+      action_detail:
+        type: string
+    type: object
 host: localhost:8000
 info:
   contact: {}
@@ -6,6 +14,76 @@ info:
   title: cnc-killer-api
   version: "1.0"
 paths:
+  /action:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new action with the provided details and condition.
+      parameters:
+      - description: Add Action Request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/requests.AddActionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success response with action details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid action data provided
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed to add an action
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Add a new action
+      tags:
+      - Actions
+  /action/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Fetches an action from the database using the provided ID.
+      parameters:
+      - description: Action ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Action retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid action ID provided
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Action not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Retrieve an action by ID
+      tags:
+      - Actions
   /auth/google:
     get:
       description: login with google

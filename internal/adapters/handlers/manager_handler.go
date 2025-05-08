@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
@@ -71,6 +72,14 @@ func (g *managerHandler) SubscribePlayer(c *websocket.Conn) {
 		}
 
 		if messageType == websocket.TextMessage {
+			var text map[string]interface{}
+			err := json.Unmarshal(message, &text)
+			if err != nil {
+				log.Fatalf("Errors : %s", err.Error())
+			}
+			for key, value := range text {
+				log.Printf("%s : '%v'\n", key, value)
+			}
 			g.service.HandlePlayerMessage(playerID, message)
 		}
 	}

@@ -15,6 +15,109 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/action": {
+            "post": {
+                "description": "Adds a new action with the provided details and condition.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Actions"
+                ],
+                "summary": "Add a new action",
+                "parameters": [
+                    {
+                        "description": "Add Action Request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.AddActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success response with action details",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid action data provided",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to add an action",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/action/{id}": {
+            "get": {
+                "description": "Fetches an action from the database using the provided ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Actions"
+                ],
+                "summary": "Retrieve an action by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Action ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Action retrieved successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid action ID provided",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Action not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/auth/google": {
             "get": {
                 "description": "login with google",
@@ -26,6 +129,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK"
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "requests.AddActionRequest": {
+            "type": "object",
+            "properties": {
+                "action_condition": {
+                    "type": "string"
+                },
+                "action_detail": {
+                    "type": "string"
                 }
             }
         }
