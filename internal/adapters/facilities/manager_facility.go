@@ -9,7 +9,6 @@ import (
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
-	"github.com/cnc-csku/cnc-killer-be-rebuild/core/responses"
 	"github.com/gofiber/contrib/websocket"
 )
 
@@ -68,7 +67,7 @@ func (m *ManagerInstance) Broadcast() error {
 // ChangeGameStatus implements repositories.ManagerRepository.
 func (m *ManagerInstance) ChangeGameStatus(newStatus string) {
 	m.game.Status = newStatus
-	statusMsg := responses.Message{
+	statusMsg := models.Message{
 		Type:     requests.MsgTypeUpdateStatus,
 		Messages: models.JSON{"status": newStatus},
 	}
@@ -83,23 +82,12 @@ func (m *ManagerInstance) GetGameStatus() string {
 
 // PlayerMessageHandle implements repositories.ManagerRepository.
 func (m *ManagerInstance) PlayerMessageHandle(playerID string, msgBytes []byte) error {
-	var msg map[string]interface{}
+	var msg models.Message
 	if err := json.Unmarshal(msgBytes, &msg); err != nil {
 		return err
 	}
-	msgType, ok := msg["type"].(string)
-	if !ok {
-		return exceptions.ErrInvalidType
-	}
-	switch msgType {
-	case requests.MsgTypeUpdateStatus:
-		newStatus, ok := msg["messages"].(string)
-		if !ok {
-			return exceptions.ErrInvalidRequest
-		}
-		m.ChangeGameStatus(newStatus)
+	switch msg.Type {
 	case requests.MsgTypeKill:
-		return nil
 	case requests.MsgTypeRevive:
 		return nil
 	default:

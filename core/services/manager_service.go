@@ -5,12 +5,11 @@ import (
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
-	"github.com/cnc-csku/cnc-killer-be-rebuild/core/responses"
 	"github.com/gofiber/contrib/websocket"
 )
 
 type ManagerService interface {
-	AddPlayer(playerID string, conn *websocket.Conn) (*responses.Message, error)
+	AddPlayer(playerID string, conn *websocket.Conn) (*models.Message, error)
 	RemovePlayer(playerID string)
 	ChangeGameStatus(newStatus string) error
 	HandleBoardcast() error
@@ -28,12 +27,12 @@ func NewManagerService(repo repositories.ManagerRepository) ManagerService {
 }
 
 // AddPlayer implements ManagerService.
-func (m *managerServiceImpl) AddPlayer(playerID string, conn *websocket.Conn) (*responses.Message, error) {
+func (m *managerServiceImpl) AddPlayer(playerID string, conn *websocket.Conn) (*models.Message, error) {
 	m.repo.AddPlayer(playerID, conn)
 
 	gameStatus := m.repo.GetGameStatus()
 
-	return &responses.Message{
+	return &models.Message{
 		Type: requests.MsgTypeUpdateStatus,
 		Messages: models.JSON{
 			"status": gameStatus,

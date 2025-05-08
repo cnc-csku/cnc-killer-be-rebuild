@@ -10,3 +10,8 @@ type Player struct {
 	ID   string
 	Conn *websocket.Conn
 }
+
+type Message struct {
+	Type     string                 `json:"type"`
+	Messages map[string]interface{} `json:"messages"`
+}

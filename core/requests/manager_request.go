@@ -18,3 +18,7 @@ const (
 	MsgTypeKill         = "kill"
 	MsgTypeRevive       = "revive"
 )
+
+type GameStatusRequest struct {
+	Status string `json:"status"`
+}
