@@ -12,4 +12,5 @@ type UserRepository interface {
 	UpdateUserRole(ctx context.Context, email string, newRole string) error
 	GenerateAccessToken(user *models.User, isAccessToken bool) (string, error)
 	GenerateRefreshToken(ctx context.Context, accessToken string) (string, error)
+	ExactJWT(tokenStr string) (*models.JWTToken, error)
 }

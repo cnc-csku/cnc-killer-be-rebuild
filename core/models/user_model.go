@@ -6,6 +6,12 @@ type User struct {
 	RefreshToken *string `db:"refresh_token"`
 }
 
+type JWTToken struct {
+	Email string `mapstructure:"email"`
+	Role  string `mapstructure:"role"`
+	Exp   int64  `mapstructure:"exp"`
+}
+
 var RoleEnum = map[string]bool{
 	"admin": true,
 	"user":  true,

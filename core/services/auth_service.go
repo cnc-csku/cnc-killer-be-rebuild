@@ -42,8 +42,8 @@ func (a *authServiceImpl) GetAuthURL() (string, error) {
 func (a *authServiceImpl) GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, error) {
 	ctx := c.Context()
 	state := c.Query("state")
-	redirect := c.Query("redirect_url") // search param have to be send before api calling
-	log.Printf("%s", redirect)
+	// redirect := c.Query("redirect_url") // search param have to be send before api calling
+	// log.Printf("%s", redirect)
 	if state == "" {
 		return nil, exceptions.ErrNoState
 	}
@@ -86,6 +86,11 @@ func (a *authServiceImpl) GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, 
 	if err != nil {
 		return nil, err
 	}
+	signedTokenStruct, err := a.userRepo.ExactJWT(signedToken)
+	if err != nil {
+		return nil, err
+	}
+	log.Print("Signed token :", signedTokenStruct)
 
 	return &responses.GoogleResponse{
 		Name:       googleUser.Name,
@@ -98,5 +103,5 @@ func (a *authServiceImpl) GetUserInfo(c *fiber.Ctx) (*responses.GoogleResponse, 
 
 // GetRefreshToken implements AuthService.
 func (a *authServiceImpl) GetRefreshToken(ctx context.Context, req *requests.TokenRequest) (string, error) {
-return a.userRepo.GenerateRefreshToken(ctx, req.Token)
+	return a.userRepo.GenerateRefreshToken(ctx, req.Token)
 }
