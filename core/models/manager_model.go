@@ -6,7 +6,7 @@ import (
 
 type JSON map[string]interface{}
 
-type Player struct {
+type Manager struct {
 	ID   string
 	Conn *websocket.Conn
 }

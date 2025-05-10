@@ -23,8 +23,8 @@ func NewManagerInstance(game *config.Game) repositories.ManagerRepository {
 }
 
 // AddPlayer implements repositories.ManagerRepository.
-func (m *ManagerInstance) AddPlayer(playerID string, conn *websocket.Conn) *models.Player {
-	player := &models.Player{
+func (m *ManagerInstance) AddPlayer(playerID string, conn *websocket.Conn) *models.Manager {
+	player := &models.Manager{
 		ID:   playerID,
 		Conn: conn,
 	}

@@ -11,6 +11,7 @@ import (
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jmoiron/sqlx"
+	"github.com/mitchellh/mapstructure"
 )
 
 type UserDatabase struct {
@@ -143,4 +144,25 @@ func (u *UserDatabase) GenerateRefreshToken(ctx context.Context, accessToken str
 
 	return accessToken, err
 
+}
+
+// ExactJWT implements repositories.UserRepository.
+func (u *UserDatabase) ExactJWT(tokenStr string) (*models.JWTToken, error) {
+	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+		return []byte(u.config.JWT.Secret), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return nil, exceptions.ErrInvalidJWT
+	}
+	var jwtToken models.JWTToken
+	err = mapstructure.Decode(&claims, &jwtToken)
+	if err != nil {
+		return nil, err
+	}
+	return &jwtToken, nil
 }

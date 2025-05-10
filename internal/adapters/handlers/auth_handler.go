@@ -28,7 +28,9 @@ func NewGoogleAuthHandler(service services.AuthService) GoogleAuthHandler {
 // GoogleCallback implements GoogleAuthHandler.
 func (g *googleAuthHandler) GoogleCallback(c *fiber.Ctx) error {
 	user, err := g.service.GetUserInfo(c)
-
+	// tokenStr := c.Cookies("token")
+	// token, err := utils.JWTDecode(tokenStr)
+	// log.Print(token)
 	if err != nil {
 		switch err {
 		case exceptions.ErrCodeNotFound:
