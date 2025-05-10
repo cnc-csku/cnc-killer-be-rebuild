@@ -5,21 +5,23 @@ import (
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/responses"
 )
 
 type UserService interface {
 	GetUserRole(ctx context.Context, email string) (*responses.RoleResponse, error)
+	ChangeUserNickname(ctx context.Context, email string, req *requests.ChangeNicknameRequest) error
+}
+
+type userServiceImpl struct {
+	repo repositories.UserRepository
 }
 
 func NewUserService(repo repositories.UserRepository) UserService {
 	return &userServiceImpl{
 		repo: repo,
 	}
-}
-
-type userServiceImpl struct {
-	repo repositories.UserRepository
 }
 
 // GetUserRole implements UserService.
@@ -35,4 +37,9 @@ func (u *userServiceImpl) GetUserRole(ctx context.Context, email string) (*respo
 	return &responses.RoleResponse{
 		Role: user.Role,
 	}, nil
+}
+
+// ChangeUserNickname implements UserService.
+func (u *userServiceImpl) ChangeUserNickname(ctx context.Context, email string, req *requests.ChangeNicknameRequest) error {
+	return u.repo.UpdateUserNickname(ctx, email, req.Nickname)
 }

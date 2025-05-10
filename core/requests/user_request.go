@@ -8,6 +8,6 @@ type UserGetRoleRequest struct {
 	UserID string `json:"user_id"`
 }
 
-type CreateUserRequest struct {
-
+type ChangeNicknameRequest struct {
+	Nickname string `json:"nickname"`
 }

@@ -2,6 +2,7 @@ package models
 
 type User struct {
 	Email        string  `db:"email"`
+	Nickname     *string `db:"nickname"`
 	Role         string  `db:"user_role"`
 	RefreshToken *string `db:"refresh_token"`
 }

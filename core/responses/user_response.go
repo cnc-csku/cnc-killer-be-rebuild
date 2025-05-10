@@ -1,8 +1,8 @@
 package responses
 
 type UserResponse struct {
-	IdToken string `json:"idToken"`
-	Role    string `json:"role"`
+	Nickname string `json:"nickname"`
+	Role     string `json:"role"`
 }
 
 type RoleResponse struct {
