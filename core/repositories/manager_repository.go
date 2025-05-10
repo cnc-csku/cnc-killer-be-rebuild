@@ -6,7 +6,7 @@ import (
 )
 
 type ManagerRepository interface {
-	AddPlayer(playerID string, conn *websocket.Conn) *models.Player
+	AddPlayer(playerID string, conn *websocket.Conn) *models.Manager
 	RemovePlayer(playerID string)
 	GetGameStatus() string
 	ChangeGameStatus(newStatus string)

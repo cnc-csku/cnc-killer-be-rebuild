@@ -9,7 +9,7 @@ import (
 
 type Game struct {
 	Status    string
-	Players   map[string](*models.Player)
+	Players   map[string](*models.Manager)
 	GameMux   sync.RWMutex
 	Broadcast chan models.Message
 }
@@ -17,7 +17,7 @@ type Game struct {
 func NewGame() *Game {
 	return &Game{
 		Status:    requests.GameStatusWaiting,
-		Players:   make(map[string](*models.Player)),
+		Players:   make(map[string](*models.Manager)),
 		Broadcast: make(chan models.Message),
 	}
 }
