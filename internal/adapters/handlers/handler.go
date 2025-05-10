@@ -13,6 +13,7 @@ type Handler struct {
 	GoogleAuthHandler GoogleAuthHandler
 	ManagerHandler    ManagerHandler
 	ActionHandler     ActionHandler
+	PlayerHandler     PlayerHandler
 }
 
 func InitHandler(db *sqlx.DB, cfg *config.Config, googleCfg *config.GoogleAuthConfig) *Handler {
@@ -29,6 +30,10 @@ func InitHandler(db *sqlx.DB, cfg *config.Config, googleCfg *config.GoogleAuthCo
 	actionService := services.NewActionService(actionRepo)
 	actionHandler := NewActionHandler(actionService)
 
+	playerRepo := postgres.NewPlayerDatabase(db)
+	playerService := services.NewPlayerService(playerRepo, userRepo)
+	playerHandler := NewPlayerHandler(playerService)
+
 	authRepo := facilities.NewGoogleAuthInstance(googleCfg)
 	authService := services.NewAuthService(authRepo, userRepo)
 	googleAuthHandler := NewGoogleAuthHandler(authService)
@@ -37,6 +42,7 @@ func InitHandler(db *sqlx.DB, cfg *config.Config, googleCfg *config.GoogleAuthCo
 		GoogleAuthHandler: googleAuthHandler,
 		ManagerHandler:    managerHandler,
 		ActionHandler:     actionHandler,
+		PlayerHandler:     playerHandler,
 	}
 
 }

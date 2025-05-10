@@ -105,6 +105,27 @@ paths:
       summary: login
       tags:
       - Auth
+  /player:
+    post:
+      consumes:
+      - application/json
+      description: Add a new player using the provided JWT token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Add a new player
+      tags:
+      - Players
   /user/nickname:
     put:
       consumes:

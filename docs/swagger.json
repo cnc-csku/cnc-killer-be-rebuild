@@ -126,6 +126,37 @@
                 }
             }
         },
+        "/player": {
+            "post": {
+                "description": "Add a new player using the provided JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Players"
+                ],
+                "summary": "Add a new player",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/user/nickname": {
             "put": {
                 "description": "Updates the nickname of a user identified by their email.",

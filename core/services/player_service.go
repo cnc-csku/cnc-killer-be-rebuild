@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
 	"github.com/google/uuid"
@@ -27,11 +28,24 @@ func NewPlayerService(playerRepo repositories.PlayerRepository, userRepo reposit
 }
 
 func (p *PlayerServiceImpl) AddPlayer(ctx context.Context, token string) error {
-	// Extract JWT token to get payload
+	if token == "" {
+		return exceptions.ErrTokenIsEmpty
+	}
+	// Extract payload from the token
 	payload, err := p.userRepo.ExactJWT(token)
 	if err != nil {
 		return err
 	}
+
+	user, err := p.userRepo.FindUserByEmail(ctx, payload.Email)
+	if err != nil {
+		return exceptions.ErrUserNotFound
+	}
+	if user.Nickname == nil {
+		return exceptions.ErrNicknameNotFound
+	}
+	secretCodeNickname := user.Nickname
+	secretCodeNumber := fmt.Sprintf("%04d", rand.Intn(10000))
 
 	// Generate a new UUID for the player
 	uuid, err := uuid.NewV7()
@@ -39,12 +53,9 @@ func (p *PlayerServiceImpl) AddPlayer(ctx context.Context, token string) error {
 		return err
 	}
 
-	secretCodeNickname := "" //TODO: GetNicknameByEmail
-	secretCodeNumber := fmt.Sprintf("%04d", rand.Intn(10000))
-
 	var player = models.Player{
 		ID:         uuid.String(),
-		SecretCode: secretCodeNickname + secretCodeNumber,
+		SecretCode: *secretCodeNickname + secretCodeNumber,
 		VictimID:   nil,
 		IsAlive:    true,
 		Score:      0,
