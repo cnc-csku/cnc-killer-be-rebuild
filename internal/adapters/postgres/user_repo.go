@@ -166,3 +166,13 @@ func (u *UserDatabase) ExactJWT(tokenStr string) (*models.JWTToken, error) {
 	}
 	return &jwtToken, nil
 }
+
+// UpdateUserNickname implements repositories.UserRepository.
+func (u *UserDatabase) UpdateUserNickname(ctx context.Context, email string, newNickname string) error {
+	query := `UPDATE users SET nickname=$1 WHERE email=$2`
+	_, err := u.db.ExecContext(ctx, query, newNickname, email)
+	if err != nil {
+		return err
+	}
+	return nil
+}
