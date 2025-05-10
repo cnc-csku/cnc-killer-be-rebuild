@@ -8,5 +8,5 @@ import (
 func UserRoutes(app *fiber.App, handler *handlers.Handler) {
 	api := app.Group("/user")
 	api.Get("/role", handler.UserHandler.GetRole)
-	api.Put("/:email/nickname", handler.UserHandler.UpdateNickname)
+	api.Put("/nickname", handler.UserHandler.UpdateNickname)
 }

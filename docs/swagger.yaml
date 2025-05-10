@@ -9,6 +9,8 @@ definitions:
     type: object
   requests.ChangeNicknameRequest:
     properties:
+      email:
+        type: string
       nickname:
         type: string
     type: object
@@ -103,17 +105,12 @@ paths:
       summary: login
       tags:
       - Auth
-  /user/{email}/nickname:
+  /user/nickname:
     put:
       consumes:
       - application/json
       description: Updates the nickname of a user identified by their email.
       parameters:
-      - description: User Email
-        in: path
-        name: email
-        required: true
-        type: string
       - description: Change Nickname Request
         in: body
         name: body

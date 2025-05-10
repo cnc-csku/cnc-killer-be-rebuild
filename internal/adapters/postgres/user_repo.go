@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/cnc-csku/cnc-killer-be-rebuild/config"
@@ -169,8 +170,17 @@ func (u *UserDatabase) ExactJWT(tokenStr string) (*models.JWTToken, error) {
 
 // UpdateUserNickname implements repositories.UserRepository.
 func (u *UserDatabase) UpdateUserNickname(ctx context.Context, email string, newNickname string) error {
+	log.Println(email, newNickname)
+	user, err := u.FindUserByEmail(ctx, email)
+	if err != nil {
+		return err
+	}
+
+	if user == nil {
+		return exceptions.ErrUserNotFound
+	}
 	query := `UPDATE users SET nickname=$1 WHERE email=$2`
-	_, err := u.db.ExecContext(ctx, query, newNickname, email)
+	_, err = u.db.ExecContext(ctx, query, newNickname, email)
 	if err != nil {
 		return err
 	}

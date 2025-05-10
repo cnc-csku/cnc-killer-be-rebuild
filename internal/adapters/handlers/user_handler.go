@@ -65,26 +65,25 @@ func (u *userHandler) GetRole(c *fiber.Ctx) error {
 //	@Tags			Users
 //	@Accept			json
 //	@Produce		json
-//	@Param			email	path		string							true	"User Email"
 //	@Param			body	body		requests.ChangeNicknameRequest	true	"Change Nickname Request"
 //	@Success		200		{string}	string							"Nickname updated successfully"
 //	@Failure		400		{string}	string							"Bad Request"
 //	@Failure		500		{object}	map[string]string				"Internal Server Error"
-//	@Router			/user/{email}/nickname [put]
+//	@Router			/user/nickname [put]
 func (u *userHandler) UpdateNickname(c *fiber.Ctx) error {
-	email := c.Params("email")
-	if email == "" {
-		return c.SendStatus(fiber.StatusBadRequest)
-	}
 	var req requests.ChangeNicknameRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
-	err := u.service.ChangeUserNickname(c.Context(), email, &req)
+	err := u.service.ChangeUserNickname(c.Context(), &req)
 	if err != nil {
 		switch err {
 		case exceptions.ErrEmailNotFound:
 			return c.SendStatus(fiber.StatusBadRequest)
+		case exceptions.ErrUserNotFound:
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": "user not found",
+			})
 		default:
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"message": err.Error(),

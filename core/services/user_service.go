@@ -11,7 +11,7 @@ import (
 
 type UserService interface {
 	GetUserRole(ctx context.Context, email string) (*responses.RoleResponse, error)
-	ChangeUserNickname(ctx context.Context, email string, req *requests.ChangeNicknameRequest) error
+	ChangeUserNickname(ctx context.Context, req *requests.ChangeNicknameRequest) error
 }
 
 type userServiceImpl struct {
@@ -40,6 +40,6 @@ func (u *userServiceImpl) GetUserRole(ctx context.Context, email string) (*respo
 }
 
 // ChangeUserNickname implements UserService.
-func (u *userServiceImpl) ChangeUserNickname(ctx context.Context, email string, req *requests.ChangeNicknameRequest) error {
-	return u.repo.UpdateUserNickname(ctx, email, req.Nickname)
+func (u *userServiceImpl) ChangeUserNickname(ctx context.Context, req *requests.ChangeNicknameRequest) error {
+	return u.repo.UpdateUserNickname(ctx, req.Email, req.Nickname)
 }
