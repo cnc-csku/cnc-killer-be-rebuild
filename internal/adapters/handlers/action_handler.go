@@ -25,16 +25,16 @@ func NewActionHandler(service services.ActionService) ActionHandler {
 }
 
 // AddAction handles the HTTP request to add a new action.
-// @Summary Add a new action
-// @Description Adds a new action with the provided details and condition.
-// @Tags Actions
-// @Accept json
-// @Produce json
-// @Param req body requests.AddActionRequest true "Add Action Request"
-// @Success 201 {object} map[string]interface{} "Success response with action details"
-// @Failure 400 {object} map[string]interface{} "Invalid action data provided"
-// @Failure 500 {object} map[string]interface{} "Failed to add an action"
-// @Router /action [post]
+//	@Summary		Add a new action
+//	@Description	Adds a new action with the provided details and condition.
+//	@Tags			Actions
+//	@Accept			json
+//	@Produce		json
+//	@Param			req	body		requests.AddActionRequest	true	"Add Action Request"
+//	@Success		201	{object}	map[string]interface{}		"Success response with action details"
+//	@Failure		400	{object}	map[string]interface{}		"Invalid action data provided"
+//	@Failure		500	{object}	map[string]interface{}		"Failed to add an action"
+//	@Router			/action [post]
 func (a *actionHandler) AddAction(c *fiber.Ctx) error {
 	var req requests.AddActionRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -73,17 +73,17 @@ func (a *actionHandler) AddAction(c *fiber.Ctx) error {
 }
 
 // FindActionByID handles the HTTP request to retrieve an action by its ID.
-// @Summary      Retrieve an action by ID
-// @Description  Fetches an action from the database using the provided ID.
-// @Tags         Actions
-// @Accept       json
-// @Produce      json
-// @Param        id   path      string  true  "Action ID"
-// @Success      200  {object}  map[string]interface{}  "Action retrieved successfully"
-// @Failure      400  {object}  map[string]interface{}  "Invalid action ID provided"
-// @Failure      404  {object}  map[string]interface{}  "Action not found"
-// @Failure      500  {object}  map[string]interface{}  "Internal server error"
-// @Router       /action/{id} [get]
+//	@Summary		Retrieve an action by ID
+//	@Description	Fetches an action from the database using the provided ID.
+//	@Tags			Actions
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string					true	"Action ID"
+//	@Success		200	{object}	map[string]interface{}	"Action retrieved successfully"
+//	@Failure		400	{object}	map[string]interface{}	"Invalid action ID provided"
+//	@Failure		404	{object}	map[string]interface{}	"Action not found"
+//	@Failure		500	{object}	map[string]interface{}	"Internal server error"
+//	@Router			/action/{id} [get]
 func (a *actionHandler) FindActionByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 

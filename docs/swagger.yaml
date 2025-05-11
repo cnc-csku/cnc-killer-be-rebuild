@@ -7,6 +7,18 @@ definitions:
       action_detail:
         type: string
     type: object
+  requests.ChangeNicknameRequest:
+    properties:
+      email:
+        type: string
+      nickname:
+        type: string
+    type: object
+  responses.RoleResponse:
+    properties:
+      role:
+        type: string
+    type: object
 host: localhost:8000
 info:
   contact: {}
@@ -93,4 +105,94 @@ paths:
       summary: login
       tags:
       - Auth
+  /player:
+    post:
+      consumes:
+      - application/json
+      description: Add a new player using the provided JWT token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Add a new player
+      tags:
+      - Players
+  /user/nickname:
+    put:
+      consumes:
+      - application/json
+      description: Updates the nickname of a user identified by their email.
+      parameters:
+      - description: Change Nickname Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ChangeNicknameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Nickname updated successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update User Nickname
+      tags:
+      - Users
+  /user/role:
+    get:
+      description: Retrieves the role of a user identified by their email.
+      parameters:
+      - description: User Email
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User role retrieved successfully
+          schema:
+            $ref: '#/definitions/responses.RoleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get User Role
+      tags:
+      - Users
 swagger: "2.0"

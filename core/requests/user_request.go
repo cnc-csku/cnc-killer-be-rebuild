@@ -8,6 +8,7 @@ type UserGetRoleRequest struct {
 	UserID string `json:"user_id"`
 }
 
-type CreateUserRequest struct {
-
+type ChangeNicknameRequest struct {
+	Email    string `json:"email"`
+	Nickname string `json:"nickname"`
 }
