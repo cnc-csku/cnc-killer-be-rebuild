@@ -45,9 +45,9 @@ func (p *PlayerDatabase) GetPlayerByID(ctx context.Context, playerID string) (*m
 	return &player, nil
 }
 
-func (p *PlayerDatabase) UpdatePlayerIsAlive(ctx context.Context, playerID string) error {
-	query := `UPDATE players SET is_alive = false WHERE player_id = $1`
-	if _, err := p.db.ExecContext(ctx, query, playerID); err != nil {
+func (p *PlayerDatabase) UpdatePlayerIsAlive(ctx context.Context, playerID string, isAlive bool) error {
+	query := `UPDATE players SET is_alive = $1 WHERE player_id = $2`
+	if _, err := p.db.ExecContext(ctx, query, isAlive, playerID); err != nil {
 		return err
 	}
 	return nil
