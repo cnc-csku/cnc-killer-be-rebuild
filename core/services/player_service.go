@@ -13,6 +13,7 @@ import (
 
 type PlayerService interface {
 	AddPlayer(ctx context.Context, token string) error
+	GetPlayerByID(ctx context.Context, playerID string) (*models.Player, error)
 }
 
 type PlayerServiceImpl struct {
@@ -68,4 +69,17 @@ func (p *PlayerServiceImpl) AddPlayer(ctx context.Context, token string) error {
 	}
 
 	return nil
+}
+
+func (p *PlayerServiceImpl) GetPlayerByID(ctx context.Context, playerID string) (*models.Player, error) {
+	if playerID == "" {
+		return nil, exceptions.ErrPlayerIDIsEmpty
+	}
+
+	player, err := p.playerRepo.GetPlayerByID(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+
+	return player, nil
 }
