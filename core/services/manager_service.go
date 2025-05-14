@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/exceptions"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/models"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
@@ -10,6 +12,7 @@ import (
 
 type ManagerService interface {
 	AddPlayer(playerID string, conn *websocket.Conn) (*models.Message, error)
+	KillPlayer(killerID string, victimID string) error
 	RemovePlayer(playerID string)
 	ChangeGameStatus(newStatus string) error
 	HandleBoardcast() error
@@ -17,20 +20,21 @@ type ManagerService interface {
 }
 
 type managerServiceImpl struct {
-	repo repositories.ManagerRepository
+	playerRepo  repositories.PlayerRepository
+	managerRepo repositories.ManagerRepository
 }
 
 func NewManagerService(repo repositories.ManagerRepository) ManagerService {
 	return &managerServiceImpl{
-		repo: repo,
+		managerRepo: repo,
 	}
 }
 
 // AddPlayer implements ManagerService.
 func (m *managerServiceImpl) AddPlayer(playerID string, conn *websocket.Conn) (*models.Message, error) {
-	m.repo.AddPlayer(playerID, conn)
+	m.managerRepo.AddPlayer(playerID, conn)
 
-	gameStatus := m.repo.GetGameStatus()
+	gameStatus := m.managerRepo.GetGameStatus()
 
 	return &models.Message{
 		Type: requests.MsgTypeUpdateStatus,
@@ -42,7 +46,7 @@ func (m *managerServiceImpl) AddPlayer(playerID string, conn *websocket.Conn) (*
 
 // RemovePlayer implements ManagerService.
 func (m *managerServiceImpl) RemovePlayer(playerID string) {
-	m.repo.RemovePlayer(playerID)
+	m.managerRepo.RemovePlayer(playerID)
 }
 
 // ChangeGameStatus implements ManagerService.
@@ -51,16 +55,41 @@ func (m *managerServiceImpl) ChangeGameStatus(newStatus string) error {
 		return exceptions.ErrInvalidGameStatus
 	}
 
-	m.repo.ChangeGameStatus(newStatus)
+	m.managerRepo.ChangeGameStatus(newStatus)
 	return nil
 }
 
 // HandleBoardcast implements ManagerService.
 func (m *managerServiceImpl) HandleBoardcast() error {
-	return m.repo.Broadcast()
+	return m.managerRepo.Broadcast()
 }
 
 // HandlePlayerMessage implements ManagerService.
 func (m *managerServiceImpl) HandlePlayerMessage(playerID string, msgBytes []byte) error {
-	return m.repo.PlayerMessageHandle(playerID, msgBytes)
+	return m.managerRepo.PlayerMessageHandle(playerID, msgBytes)
+}
+
+// KillPlayer implements ManagerService.
+func (m *managerServiceImpl) KillPlayer(killerID string, victimID string) error {
+	ctx := context.Background()
+	killer, err := m.playerRepo.GetPlayerByID(ctx, killerID)
+	if err != nil {
+		return err
+	}
+	victim, err := m.playerRepo.GetPlayerByID(ctx, victimID)
+	if err != nil {
+		return err
+	}
+	if !victim.IsAlive {
+		return exceptions.ErrPlayerAlreadyDead
+	}
+	if killer.VictimID == nil || *(killer.VictimID) != victimID {
+		return exceptions.ErrInvalidVictim
+	}
+	err = m.playerRepo.UpdatePlayerIsAlive(ctx, victimID, false)
+	if err != nil {
+		return err
+	}
+	m.managerRepo.KillPlayer(killerID, victimID)
+	return nil
 }

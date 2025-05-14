@@ -10,6 +10,7 @@ import (
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/repositories"
 	"github.com/cnc-csku/cnc-killer-be-rebuild/core/requests"
 	"github.com/gofiber/contrib/websocket"
+	"github.com/gofiber/fiber/v2"
 )
 
 type ManagerInstance struct {
@@ -104,4 +105,18 @@ func (m *ManagerInstance) RemovePlayer(playerID string) {
 	m.game.GameMux.Unlock()
 
 	log.Printf("Player %s left the game. Remaining players: %d", playerID, len(m.game.Players))
+}
+
+// KillPlayer implements repositories.ManagerRepository.
+func (m *ManagerInstance) KillPlayer(killerID string, victimID string) {
+	victim, ok := m.game.Players[victimID]
+	if !ok {
+		return
+	}
+	victim.Conn.WriteJSON(&models.Message{
+		Type: requests.MsgTypeKill,
+		Messages: fiber.Map{
+			"killed_by": killerID,
+		},
+	})
 }
